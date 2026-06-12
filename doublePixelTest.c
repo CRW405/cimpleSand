@@ -8,12 +8,6 @@
 #include <time.h>
 #include <unistd.h>
 
-// TODO:
-// - screen
-// - mouse info
-// - rendering
-// - click and key events
-
 #define CLEAR "\e[2J"
 #define CUR_TO_TOP "\e[H"
 #define HIDE_CUR "\e[?25l"
@@ -29,6 +23,7 @@
 #define BG_MAGENTA "\e[45m"
 #define BG_CYAN "\e[46m"
 #define BG_WHITE "\e[47m"
+
 #define BLACK "\e[30m"
 #define RED "\e[31m"
 #define GREEN "\e[32m"
@@ -69,8 +64,8 @@ void handle_sigint(int sig) {
 }
 
 char *random_color() {
-	int random_int = rand() % 8;
-	switch (random_int) {
+	int r = rand() % 8;
+	switch (r) {
 	case 0:
 		return BLACK;
 	case 1:
@@ -92,8 +87,8 @@ char *random_color() {
 }
 
 char *random_bg_color() {
-	int random_int = rand() % 8;
-	switch (random_int) {
+	int r = rand() % 8;
+	switch (r) {
 	case 0:
 		return BG_BLACK;
 	case 1:
@@ -124,16 +119,20 @@ static char gui_buffer[256];
 
 void init_grid(int width, int height) {
 	screen_width = width;
-	screen_height = (height % 2 == 0) ? height : height + 1;
+	screen_height = height;
 	grid_size = width * height;
-	grid = calloc(grid_size, sizeof(unsigned char));
+	grid = malloc(grid_size);
+
+	// Each character text cell now takes up to ~20 bytes due to matching
+	// both foreground + background ANSI escapes plus multi-byte UTF8 "▄"
+	// characters.
 	frame_buffer_size = (grid_size * 25) + sizeof(gui_buffer);
 	frame_buffer = malloc(frame_buffer_size);
 }
 
 int fps;
-int cell_count; // for later
-char last_input;
+int cell_count;
+char last_input = ' ';
 
 char *gui() {
 	snprintf(gui_buffer, sizeof(gui_buffer),
@@ -148,23 +147,35 @@ void render() {
 	term_op(1, false, CUR_TO_TOP);
 	frame_buffer_offset = 0;
 
+	// Notice: We advance the visual text row loop by 2 lines of resolution per
+	// pass!
 	for (int y = 0; y < screen_height; y += 2) {
 		for (int x = 0; x < screen_width; x++) {
+
+			// For this test preview, we directly generate random colors for the
+			// Top Half (Background color) and Bottom Half (Foreground color)
+			char *top_color = random_bg_color();
+			char *bottom_color = random_color();
 
 			frame_buffer_offset +=
 			    snprintf(frame_buffer + frame_buffer_offset,
 			             frame_buffer_size - frame_buffer_offset, "%s%s▄",
-			             random_bg_color(), random_color());
+			             top_color, bottom_color);
 		}
+
+		// Reset styles cleanly at the boundary of each row before appending the
+		// newline
 		frame_buffer_offset += snprintf(frame_buffer + frame_buffer_offset,
 		                                frame_buffer_size - frame_buffer_offset,
 		                                "%s\n", RESET_STYLE);
 	}
+
+	// Append the interactive GUI metadata text bar to the final string
 	frame_buffer_offset +=
 	    snprintf(frame_buffer + frame_buffer_offset,
 	             frame_buffer_size - frame_buffer_offset, "%s", gui());
-	printf("%s", frame_buffer);
 
+	printf("%s", frame_buffer);
 	fflush(stdout);
 }
 
@@ -193,35 +204,11 @@ char input_char;
 
 void handle_input() {
 	if (isInput()) {
-		read(STDIN_FILENO, &input_char, 1);
-
-		if (input_char == '\e') { // Handle escape sequences such as arrow keys
-			char seq[3];
-			if (read(STDIN_FILENO, &seq[0], 1) == 0)
-				return;
-			if (read(STDIN_FILENO, &seq[1], 1) == 0)
-				return;
-			if (seq[0] == '[') {
-				switch (seq[1]) {
-				case 'A':
-					// Up arrow
-					break;
-				case 'B':
-					// Down arrow
-					break;
-				case 'C':
-					// Right arrow
-					break;
-				case 'D':
-					// Left arrow
-					break;
-				}
-			}
-
-		} else {
+		if (read(STDIN_FILENO, &input_char, 1) > 0) {
 			switch (input_char) {
 			case 'q':
-				// running = false;
+				running = false; // Fixed: Restored quit interaction switch loop
+				                 // boundary
 				break;
 			default:
 				break;
@@ -234,7 +221,13 @@ void handle_input() {
 typedef struct timespec Timespec;
 
 int main() {
+	srand(time(
+	    NULL)); // Seeds random generator so patterns shift dynamically on boot
 	signal(SIGINT, handle_sigint);
+
+	// Setting up a grid. 50x50 means 50 horizontal pixels by 50 vertical
+	// pixels. Thanks to our half-block optimizations, this will take up a 50x25
+	// character viewport box!
 	init_grid(50, 50);
 	init_screen();
 
@@ -264,12 +257,12 @@ int main() {
 		}
 
 		if (total_frame_time > 0) {
-			fps = 1000000 / total_frame_time;
+			fps = (int)(1000000 / total_frame_time);
 		}
 	}
 
 	free(grid);
-	free(frame_buffer);
+	free(frame_buffer); // Freeing the custom frame buffer allocation
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_term);
 	reset_term();
 	return EXIT_SUCCESS;

@@ -9,10 +9,25 @@ A simple sand sim written in C running in the terminal.
 
 ### Features
 
-- Text based rendering
+- Unicode based rendering
 - Sand simulation
 - Mouse controls, click to place, rclick to erase
 
 ### Scratch
 
+is an arr the best place for the sim? - probably?
 
+#### Rendering
+
+- Get terminal bounds - didnt do this
+- Map an arr to the screen - done
+- Turn terminal output into a screen like cava or cmatrix - done
+- frames // dirty rendering? probably way overkill - done, single buffer
+- probably symbols to start with, but could use colors later. - done, did colors
+- I want pixels, not rectangles, character shape may interfere - done, using unicode block characters
+
+#### Controls
+
+- Get mouse position on terminal window, map to index in arr
+- Get click events
+- Use keys for element selection
