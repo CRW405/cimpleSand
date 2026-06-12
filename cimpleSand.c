@@ -9,10 +9,7 @@
 #include <unistd.h>
 
 // TODO:
-// - screen
-// - mouse info
 // - rendering
-// - click and key events
 
 #define CLEAR "\e[2J"
 #define CUR_TO_TOP "\e[H"
@@ -20,6 +17,12 @@
 #define SHOW_CUR "\e[?25h"
 #define ALT_SCREEN "\e[?1049h"
 #define MAIN_SCREEN "\e[?1049l"
+#define ENABLE_MOUSE "\e[?1003h"
+#define DISABLE_MOUSE "\e[?1003l"
+#define ENABLE_MOUSE_SGR "\e[?1006h"
+#define DISABLE_MOUSE_SGR "\e[?1006l"
+#define EABLE_FOCUS "\e[?1004h"
+#define DISABLE_FOCUS "\e[?1004l"
 
 #define BG_BLACK "\e[40m"
 #define BG_RED "\e[41m"
@@ -58,8 +61,14 @@ void term_op(int op_count, bool flush, ...) {
 		fflush(stdout);
 }
 
-void init_screen() { term_op(3, true, CLEAR, HIDE_CUR, ALT_SCREEN); }
-void reset_term() { term_op(2, true, SHOW_CUR, MAIN_SCREEN); }
+void init_screen() {
+	term_op(6, true, CLEAR, HIDE_CUR, ALT_SCREEN, ENABLE_MOUSE_SGR,
+	        ENABLE_MOUSE, EABLE_FOCUS);
+}
+void reset_term() {
+	term_op(5, true, SHOW_CUR, MAIN_SCREEN, DISABLE_MOUSE_SGR, DISABLE_MOUSE,
+	        DISABLE_FOCUS);
+}
 
 bool running = true;
 
@@ -133,12 +142,15 @@ void init_grid(int width, int height) {
 
 int fps;
 int cell_count; // for later
-char last_input;
+char last_input = ' ';
+int mouse_x = 0;
+int mouse_y = 0;
+int sim_mouse_y = 0;
 
 char *gui() {
 	snprintf(gui_buffer, sizeof(gui_buffer),
-	         "FPS: %d | Cells: %d | Last Input: %c", fps, cell_count,
-	         last_input);
+	         "FPS: %d | Cells: %d | Last Input: %c | Mouse: %d, %d (%d)", fps,
+	         cell_count, last_input, mouse_x, mouse_y, sim_mouse_y);
 	return gui_buffer;
 }
 
@@ -190,38 +202,70 @@ int isInput() {
 }
 
 char input_char;
+int mouse_button;
+char mouse_event_type;
 
 void handle_input() {
-	if (isInput()) {
+	while (isInput()) {
 		read(STDIN_FILENO, &input_char, 1);
 
-		if (input_char == '\e') { // Handle escape sequences such as arrow keys
-			char seq[3];
-			if (read(STDIN_FILENO, &seq[0], 1) == 0)
-				return;
-			if (read(STDIN_FILENO, &seq[1], 1) == 0)
-				return;
-			if (seq[0] == '[') {
+		if (input_char == '\e') {
+			int seq_size = 64;
+			char seq[seq_size];
+			int i = 0;
+
+			// read full escape sequences
+			while (isInput() && i < seq_size - 1) {
+				read(STDIN_FILENO, &seq[i], 1);
+				if (seq[i] == 'A' || seq[i] == 'B' || seq[i] == 'C' ||
+				    seq[i] == 'D' || seq[i] == 'M' || seq[i] == 'm' ||
+				    seq[i] == 'I' || seq[i] == 'O') {
+					i++;
+					break;
+				}
+				i++;
+			}
+			seq[i] = '\0';
+
+			// Arrow keys
+			if (seq[0] == '[' && seq[1] != '<') {
 				switch (seq[1]) {
 				case 'A':
-					// Up arrow
+					last_input = '^';
 					break;
 				case 'B':
-					// Down arrow
+					last_input = 'V';
 					break;
 				case 'C':
-					// Right arrow
+					last_input = '>';
 					break;
 				case 'D':
-					// Left arrow
+					last_input = '<';
 					break;
 				}
 			}
+			// Mouse events (SGR format)
+			else if (seq[0] == '[' && seq[1] == '<') {
+				mouse_event_type = seq[i - 1];
 
-		} else {
+				// sscanf(seq + 2, "%d;%d;%d", &mouse_button, &mouse_x,
+				// &mouse_y); last_input = mouse_event_type;
+
+				int tmpx = 0, tmpy = 0, tmpbtn = 0;
+				if (sscanf(seq + 2, "%d;%d;%d", &tmpbtn, &tmpx, &tmpy) == 3) {
+					mouse_button = tmpbtn;
+					mouse_x = tmpx;
+					mouse_y = tmpy;
+					sim_mouse_y = ((mouse_y) * 2);
+				}
+				last_input = mouse_event_type;
+			}
+		}
+		// Regular key input_char
+		else {
 			switch (input_char) {
 			case 'q':
-				// running = false;
+				running = false;
 				break;
 			default:
 				break;
