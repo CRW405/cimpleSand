@@ -8,9 +8,6 @@
 #include <time.h>
 #include <unistd.h>
 
-// TODO:
-// - rendering
-
 #define CLEAR "\e[2J"
 #define CUR_TO_TOP "\e[H"
 #define HIDE_CUR "\e[?25l"
@@ -45,6 +42,43 @@
 
 #define TARGET_FPS 120
 #define FRAME_TIME (1000000 / TARGET_FPS)
+
+#define EMPTY 0
+#define WALL 1
+#define SAND 2
+#define WATER 3
+
+int current_cell = WALL;
+
+char *get_cell_color(int cell) {
+	switch (cell) {
+	case EMPTY:
+		return BLACK;
+	case WALL:
+		return WHITE;
+	case SAND:
+		return YELLOW;
+	case WATER:
+		return BLUE;
+	default:
+		return RED;
+	}
+}
+
+char *get_cell_bg_color(int cell) {
+	switch (cell) {
+	case EMPTY:
+		return BG_BLACK;
+	case WALL:
+		return BG_WHITE;
+	case SAND:
+		return BG_YELLOW;
+	case WATER:
+		return BG_BLUE;
+	default:
+		return BG_RED;
+	}
+}
 
 void term_op(int op_count, bool flush, ...) {
 	va_list args;
@@ -141,10 +175,11 @@ void init_grid(int width, int height) {
 }
 
 int fps;
-int cell_count; // for later
+int cell_count;
 char last_input = ' ';
 int mouse_x = 0;
 int mouse_y = 0;
+int sim_mouse_x = 0;
 int sim_mouse_y = 0;
 
 char *gui() {
@@ -162,11 +197,21 @@ void render() {
 
 	for (int y = 0; y < screen_height; y += 2) {
 		for (int x = 0; x < screen_width; x++) {
+			// frame_buffer_offset +=
+			//     snprintf(frame_buffer + frame_buffer_offset,
+			//              frame_buffer_size - frame_buffer_offset, "%s%s▄",
+			//              random_bg_color(), random_color());
+
+			unsigned char top_cell = grid[((y)*screen_width) + x];
+			char *top_color = get_cell_bg_color(top_cell);
+
+			unsigned char bottom_cell = grid[((y + 1) * screen_width) + x];
+			char *bottom_color = get_cell_color(bottom_cell);
 
 			frame_buffer_offset +=
 			    snprintf(frame_buffer + frame_buffer_offset,
 			             frame_buffer_size - frame_buffer_offset, "%s%s▄",
-			             random_bg_color(), random_color());
+			             top_color, bottom_color);
 		}
 		frame_buffer_offset += snprintf(frame_buffer + frame_buffer_offset,
 		                                frame_buffer_size - frame_buffer_offset,
@@ -199,6 +244,16 @@ int isInput() {
 	FD_ZERO(&readfds);
 	FD_SET(STDIN_FILENO, &readfds);
 	return select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
+}
+
+char getCell(int x, int y) {
+	int index = (y * screen_width) + x;
+	return grid[index];
+}
+
+void set_cell(int x, int y, char cell) {
+	int index = (y * screen_width) + x;
+	grid[index] = cell;
 }
 
 char input_char;
@@ -247,16 +302,26 @@ void handle_input() {
 			// Mouse events (SGR format)
 			else if (seq[0] == '[' && seq[1] == '<') {
 				mouse_event_type = seq[i - 1];
-
-				// sscanf(seq + 2, "%d;%d;%d", &mouse_button, &mouse_x,
-				// &mouse_y); last_input = mouse_event_type;
-
 				int tmpx = 0, tmpy = 0, tmpbtn = 0;
 				if (sscanf(seq + 2, "%d;%d;%d", &tmpbtn, &tmpx, &tmpy) == 3) {
 					mouse_button = tmpbtn;
 					mouse_x = tmpx;
 					mouse_y = tmpy;
-					sim_mouse_y = ((mouse_y) * 2);
+
+					sim_mouse_x = mouse_x - 1;
+					sim_mouse_y = ((mouse_y - 1) * 2);
+
+					if (mouse_event_type == 'M') {
+						if (mouse_button == 0 || mouse_button == 32) {
+							set_cell(sim_mouse_x, sim_mouse_y, current_cell);
+							set_cell(sim_mouse_x, sim_mouse_y + 1,
+							         current_cell);
+						}
+						if (mouse_button == 2 || mouse_button == 34) {
+							set_cell(sim_mouse_x, sim_mouse_y, EMPTY);
+							set_cell(sim_mouse_x, sim_mouse_y + 1, EMPTY);
+						}
+					}
 				}
 				last_input = mouse_event_type;
 			}
@@ -266,6 +331,15 @@ void handle_input() {
 			switch (input_char) {
 			case 'q':
 				running = false;
+				break;
+			case '1':
+				current_cell = WALL;
+				break;
+			case '2':
+				current_cell = SAND;
+				break;
+			case '3':
+				current_cell = WATER;
 				break;
 			default:
 				break;
