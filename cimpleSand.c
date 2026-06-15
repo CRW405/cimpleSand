@@ -181,11 +181,14 @@ int mouse_x = 0;
 int mouse_y = 0;
 int sim_mouse_x = 0;
 int sim_mouse_y = 0;
+int cur_radius = 1;
 
 char *gui() {
 	snprintf(gui_buffer, sizeof(gui_buffer),
-	         "FPS: %d | Cells: %d | Last Input: %c | Mouse: %d, %d (%d)", fps,
-	         cell_count, last_input, mouse_x, mouse_y, sim_mouse_y);
+	         "FPS: %d | Cells: %d | Last Input: %c | Mouse: %d, %d (%d) | "
+	         "Selected: %d | Brush Size: %d",
+	         fps, cell_count, last_input, mouse_x, mouse_y, sim_mouse_y,
+	         current_cell, cur_radius);
 	return gui_buffer;
 }
 
@@ -248,12 +251,39 @@ int isInput() {
 
 char getCell(int x, int y) {
 	int index = (y * screen_width) + x;
+	if (x < 0 || x > screen_width || y < 0 || y > screen_height) {
+		return WALL;
+	}
 	return grid[index];
 }
 
 void set_cell(int x, int y, char cell) {
 	int index = (y * screen_width) + x;
+	if (x < 0 || x > screen_width || y < 0 || y > screen_height) {
+		return;
+	}
 	grid[index] = cell;
+}
+
+void paint(int x_center, int y_center, int radius, char cell) {
+	for (int x = x_center - radius; x <= x_center; x++) {
+		for (int y = y_center - radius; y <= y_center; y++) {
+
+			int dx = x - x_center;
+			int dy = y - y_center;
+
+			if ((dx * dx) + (dy * dy) <= (radius * radius)) {
+
+				int x_sym = x_center - dx;
+				int y_sym = y_center - dy;
+
+				set_cell(x, y, cell);
+				set_cell(x_sym, y, cell);
+				set_cell(x, y_sym, cell);
+				set_cell(x_sym, y_sym, cell);
+			}
+		}
+	}
 }
 
 char input_char;
@@ -313,13 +343,24 @@ void handle_input() {
 
 					if (mouse_event_type == 'M') {
 						if (mouse_button == 0 || mouse_button == 32) {
-							set_cell(sim_mouse_x, sim_mouse_y, current_cell);
-							set_cell(sim_mouse_x, sim_mouse_y + 1,
-							         current_cell);
+							if (cur_radius > 1) {
+								paint(sim_mouse_x, sim_mouse_y, cur_radius,
+								      current_cell);
+							} else {
+								set_cell(sim_mouse_x, sim_mouse_y,
+								         current_cell);
+								set_cell(sim_mouse_x, sim_mouse_y + 1,
+								         current_cell);
+							}
 						}
 						if (mouse_button == 2 || mouse_button == 34) {
-							set_cell(sim_mouse_x, sim_mouse_y, EMPTY);
-							set_cell(sim_mouse_x, sim_mouse_y + 1, EMPTY);
+							if (cur_radius > 1) {
+								paint(sim_mouse_x, sim_mouse_y, cur_radius,
+								      EMPTY);
+							} else {
+								set_cell(sim_mouse_x, sim_mouse_y, EMPTY);
+								set_cell(sim_mouse_x, sim_mouse_y + 1, EMPTY);
+							}
 						}
 					}
 				}
@@ -341,6 +382,16 @@ void handle_input() {
 			case '3':
 				current_cell = WATER;
 				break;
+			case '_':
+			case '-':
+				if (cur_radius > 1) {
+					cur_radius--;
+				}
+				break;
+			case '=':
+			case '+':
+				cur_radius++;
+				break;
 			default:
 				break;
 			}
@@ -353,7 +404,7 @@ typedef struct timespec Timespec;
 
 int main() {
 	signal(SIGINT, handle_sigint);
-	init_grid(50, 50);
+	init_grid(400, 200);
 	init_screen();
 
 	Termios orig_term = enable_raw_term();

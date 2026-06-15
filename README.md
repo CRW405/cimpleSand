@@ -15,7 +15,7 @@ A simple sand sim written in C running in the terminal.
 
 ### Scratch
 
-is an arr the best place for the sim? - probably?
+
 
 #### Rendering
 
@@ -28,6 +28,6 @@ is an arr the best place for the sim? - probably?
 
 #### Controls
 
-- Get mouse position on terminal window, map to index in arr
-- Get click events
-- Use keys for element selection
+- Get mouse position on terminal window, map to index in arr - done
+- Get click events - done
+- Use keys for element selection - done
