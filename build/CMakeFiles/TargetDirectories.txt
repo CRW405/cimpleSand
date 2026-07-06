@@ -1,0 +1,3 @@
+/home/think/Documents/cimpleSand/build/CMakeFiles/CimpleSand.dir
+/home/think/Documents/cimpleSand/build/CMakeFiles/edit_cache.dir
+/home/think/Documents/cimpleSand/build/CMakeFiles/rebuild_cache.dir

@@ -8,6 +8,13 @@
 #include <time.h>
 #include <unistd.h>
 
+// TODO:
+// - Sim
+// BONUS:
+// - scroll for brush size
+// - get terminal screen bounds
+// - automatically zoom terminal out
+
 #define CLEAR "\e[2J"
 #define CUR_TO_TOP "\e[H"
 #define HIDE_CUR "\e[?25l"
@@ -200,10 +207,6 @@ void render() {
 
 	for (int y = 0; y < screen_height; y += 2) {
 		for (int x = 0; x < screen_width; x++) {
-			// frame_buffer_offset +=
-			//     snprintf(frame_buffer + frame_buffer_offset,
-			//              frame_buffer_size - frame_buffer_offset, "%s%s▄",
-			//              random_bg_color(), random_color());
 
 			unsigned char top_cell = grid[((y)*screen_width) + x];
 			char *top_color = get_cell_bg_color(top_cell);
@@ -404,7 +407,7 @@ typedef struct timespec Timespec;
 
 int main() {
 	signal(SIGINT, handle_sigint);
-	init_grid(400, 200);
+	init_grid(100, 100);
 	init_screen();
 
 	Termios orig_term = enable_raw_term();
