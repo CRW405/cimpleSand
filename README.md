@@ -1,33 +1,88 @@
+# CimpleSand
 
-# A simple sand sim in C for a proof of concept to myself and to improve my C skills
+**CimpleSand** is a real-time falling-sand simulation written in pure C that runs entirely in the terminal.
+
+## Description
+
+This is just a fun project for me to get better with C by tackling an idea I've had floating around in my head for a while.
+
+Simple falling sand sim being rendered by a custom made text based rasterization engine that uses Unicode escape sequences on supporting terminal emulators.
+
+## Build and run
+
+### Requirements
+
+- C compiler (GCC/Clang)
+- CMake 3.10+
+- Linux/macOS terminal with ANSI + mouse reporting support. (I used kitty to develop this)
+Not sure how you would / if you can run this on windows but maybe try WSL?
+
+### Build
+
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
+### Run
+
+```bash
+./build/CimpleSand
+```
+
+Optional grid size:
+
+```bash
+./build/CimpleSand -w 120 -h 80
+```
+
+## Controls
+
+| Input | Action |
+|---|---|
+| `q` | Quit |
+| `1` | Select Wall |
+| `2` | Select Sand |
+| `3` | Select Water |
+| `-` / `_` | Decrease brush size |
+| `+` / `=` | Increase brush size |
+| Left click / drag | Paint selected material |
+| Right click / drag | Erase (paint Empty) |
+
+## Rendering engine notes
+
+The renderer maps two simulation cells into one terminal character row using the Unicode lower-half block (`▄`):
+
+- top simulation cell -> terminal **background**
+- bottom simulation cell -> terminal **foreground**
+
+This gives a compact, pixel-like output while keeping writes sequential and cache-friendly. Each frame is assembled into a single `frame_buffer` and flushed in one print pass to reduce terminal I/O overhead and flicker.
+
+## Simulation model
+
+- Grid stored as a contiguous `unsigned char` buffer (`grid`)
+- Elements defined in a global `element_registry` (name, colors, density, sim function)
+- Movement uses density checks (`can_displace`) and cell swaps
+- Bottom-up update order to produce stable falling behavior
+
+## Project structure
+
+```text
+src/
+  main.c       # main loop, element registry, simulation behaviors
+  render.c     # frame assembly + terminal rasterization + HUD
+  input.c      # keyboard and SGR mouse parsing, painting tools
+  term_ops.c   # terminal mode setup/teardown and ANSI op helpers
+  common.h     # shared constants, globals, types, escape codes
+```
 
 ## Notes
 
-### Description
+### TODO:
 
-A simple sand sim written in C running in the terminal.
-
-### Features
-
-- Unicode based rendering
-- Sand simulation
-- Mouse controls, click to place, rclick to erase
-
-### Scratch
-
-
-
-#### Rendering
-
-- Get terminal bounds - didnt do this
-- Map an arr to the screen - done
-- Turn terminal output into a screen like cava or cmatrix - done
-- frames // dirty rendering? probably way overkill - done, single buffer
-- probably symbols to start with, but could use colors later. - done, did colors
-- I want pixels, not rectangles, character shape may interfere - done, using unicode block characters
-
-#### Controls
-
-- Get mouse position on terminal window, map to index in arr - done
-- Get click events - done
-- Use keys for element selection - done
+- more opts: fps target
+- Make it so that holding click doesnt require movement to trigger paint()
+- Make the cell count work
+- Get terminal bounds?
+- Fix the UI buffer not clearing problem at brush size section
+- Add a current element name readout to UI

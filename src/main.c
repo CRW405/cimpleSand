@@ -144,7 +144,6 @@ void sim_sand(int x, int y) {
 
 static void try_spread_water(int x, int y) {
 	int spread_amount = 10;
-	// Porting Godot's randi_range(1, spread_amount) logic
 	int spread_distance = 1 + (rand() % spread_amount);
 	int dir = (rand() % 2 == 0) ? 1 : -1;
 
