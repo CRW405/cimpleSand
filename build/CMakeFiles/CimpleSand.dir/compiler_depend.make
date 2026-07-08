@@ -327,9 +327,9 @@ CMakeFiles/CimpleSand.dir/src/render.c.o: /home/think/Documents/cimpleSand/src/r
   /usr/include/termios.h \
   /usr/include/time.h \
   /usr/include/unistd.h \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdarg.h \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdbool.h \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stddef.h
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdarg.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdbool.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stddef.h
 
 CMakeFiles/CimpleSand.dir/src/term_ops.c.o: /home/think/Documents/cimpleSand/src/term_ops.c \
   /home/think/Documents/cimpleSand/src/common.h \
@@ -436,22 +436,22 @@ CMakeFiles/CimpleSand.dir/src/term_ops.c.o: /home/think/Documents/cimpleSand/src
   /usr/include/termios.h \
   /usr/include/time.h \
   /usr/include/unistd.h \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdarg.h \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdbool.h \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stddef.h
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdarg.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdbool.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stddef.h
 
 CimpleSand: /usr/lib/Scrt1.o \
   /usr/lib/crti.o \
   /usr/lib/crtn.o \
-  /usr/lib/libatomic.so \
-  /usr/lib/libatomic_asneeded.so \
   /usr/lib/libc.so \
-  /usr/lib/libgcc_s.so \
   /usr/lib/libgcc_s.so.1 \
-  /usr/lib/libgcc_s_asneeded.so \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/crtbeginS.o \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/crtendS.o \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/libgcc.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s.so \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s_asneeded.so \
   /usr/lib/ld-linux-x86-64.so.2 \
   /usr/lib/libc.so.6 \
   /usr/lib/libc_nonshared.a \
@@ -463,17 +463,9 @@ CimpleSand: /usr/lib/Scrt1.o \
 
 CMakeFiles/CimpleSand.dir/src/term_ops.c.o:
 
-CMakeFiles/CimpleSand.dir/src/main.c.o:
-
 CMakeFiles/CimpleSand.dir/src/input.c.o:
 
 /usr/lib/libc_nonshared.a:
-
-/usr/lib/libc.so.6:
-
-/usr/lib/ld-linux-x86-64.so.2:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/libgcc.a:
 
 /usr/include/bits/types/__FILE.h:
 
@@ -500,6 +492,10 @@ CMakeFiles/CimpleSand.dir/src/input.c.o:
 /usr/include/bits/termios-cbaud.h:
 
 /usr/include/bits/termios-c_oflag.h:
+
+/usr/include/bits/termios-struct.h:
+
+/usr/include/bits/termios-c_lflag.h:
 
 /usr/include/bits/floatn-common.h:
 
@@ -545,15 +541,11 @@ CMakeFiles/CimpleSand.dir/src/input.c.o:
 
 /usr/include/bits/atomic_wide_counter.h:
 
-/usr/include/bits/environments.h:
-
 /usr/include/sys/select.h:
 
 /usr/include/bits/stdio.h:
 
 /usr/include/bits/unistd_ext.h:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdarg.h:
 
 /usr/include/bits/thread-shared-types.h:
 
@@ -563,6 +555,8 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdarg.h:
 
+/usr/include/bits/siginfo-consts.h:
+
 /usr/include/gnu/stubs.h:
 
 /usr/include/bits/pthreadtypes-arch.h:
@@ -570,6 +564,8 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 /usr/include/stdc-predef.h:
 
 /usr/include/bits/sigcontext.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s.so:
 
 /usr/include/bits/types/__fpos64_t.h:
 
@@ -595,6 +591,8 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /home/think/Documents/cimpleSand/src/term_ops.h:
 
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.a:
+
 /usr/include/bits/struct_mutex.h:
 
 /usr/include/bits/signum-generic.h:
@@ -615,8 +613,6 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/bits/types/__sigset_t.h:
 
-/usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdbool.h:
-
 /usr/include/bits/types/__fpos_t.h:
 
 /usr/include/bits/types/clock_t.h:
@@ -633,13 +629,17 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/bits/types/once_flag.h:
 
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a:
+
 /usr/include/bits/types/sigevent_t.h:
 
 /usr/include/bits/types/siginfo_t.h:
 
-/usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stddef.h:
-
 /usr/include/bits/types/sigval_t.h:
+
+/usr/include/bits/environments.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o:
 
 /usr/include/bits/ss_flags.h:
 
@@ -679,6 +679,10 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/features-time64.h:
 
+/usr/include/bits/endianness.h:
+
+/usr/include/features.h:
+
 /usr/include/signal.h:
 
 /usr/include/sys/cdefs.h:
@@ -693,6 +697,8 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /home/think/Documents/cimpleSand/src/main.c:
 
+/home/think/Documents/cimpleSand/src/term_ops.c:
+
 /usr/include/bits/types/timer_t.h:
 
 /usr/lib/Scrt1.o:
@@ -701,32 +707,20 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/lib/crtn.o:
 
-/usr/include/bits/endianness.h:
+CMakeFiles/CimpleSand.dir/src/main.c.o:
 
-/usr/include/features.h:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so:
 
-/usr/lib/libatomic.so:
-
-/usr/lib/libatomic_asneeded.so:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s_asneeded.so:
 
 /usr/lib/libc.so:
-
-/home/think/Documents/cimpleSand/src/term_ops.c:
-
-/usr/lib/libgcc_s.so:
 
 /usr/include/bits/confname.h:
 
 /usr/lib/libgcc_s.so.1:
 
-/usr/include/bits/termios-struct.h:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o:
 
-/usr/include/bits/termios-c_lflag.h:
+/usr/lib/ld-linux-x86-64.so.2:
 
-/usr/lib/libgcc_s_asneeded.so:
-
-/usr/include/bits/siginfo-consts.h:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/crtbeginS.o:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/crtendS.o:
+/usr/lib/libc.so.6:
