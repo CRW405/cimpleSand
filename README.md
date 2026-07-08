@@ -33,7 +33,7 @@ cmake --build build
 Optional grid size:
 
 ```bash
-./build/CimpleSand -w 100 -h 100
+./build/CimpleSand -w 100 -h 100 # Larger sizes may not render correctly on your terminal, with a max zoom kitty terminal I cannot go above 200x200 without issues
 ```
 
 ## Controls
@@ -84,6 +84,12 @@ src/
     - I'll fix this eventually, I just need to clear the UI buffer correctly.
 
 ## Notes
+
+### Planned Improvements
+
+- Smart Simulating, simulate only active areas
+- Better / faster water settling
+- More elements: Fire, Stone, Steam, Lava, Life
 
 ### TODO:
 
