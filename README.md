@@ -33,7 +33,7 @@ cmake --build build
 Optional grid size:
 
 ```bash
-./build/CimpleSand -w 120 -h 80
+./build/CimpleSand -w 100 -h 100
 ```
 
 ## Controls
