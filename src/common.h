@@ -71,4 +71,16 @@ extern int sim_mouse_x;
 extern int sim_mouse_y;
 extern int cur_radius;
 
+typedef void (*ElementSimFn)(int x, int y);
+
+typedef struct {
+	const char *name;
+	const char *color;
+	const char *bg_color;
+	const int density;
+	ElementSimFn sim_fn;
+} Element;
+
+extern const Element element_registry[];
+
 #endif

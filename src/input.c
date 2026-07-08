@@ -8,7 +8,7 @@ extern void set_cell(int x, int y, char cell);
 extern void paint(int x_center, int y_center, int radius, char cell);
 
 int isInput() {
-	Timeval timeout = {0, 0};
+	Timeval timeout = { 0, 0 };
 	fd_set readfds;
 	FD_ZERO(&readfds);
 	FD_SET(STDIN_FILENO, &readfds);

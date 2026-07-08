@@ -67,10 +67,177 @@ void paint(int x_center, int y_center, int radius, char cell) {
 	}
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// sim
+
+void sim_sand(int x, int y);
+void sim_water(int x, int y);
+
+const Element element_registry[] = {
+	[EMPTY] = { .name = "Empty",
+               .color = BLACK,
+               .bg_color = BG_BLACK,
+               .density = 0,
+               .sim_fn = NULL      },
+	[WALL] = { .name = "Wall",
+	           .color = WHITE,
+	           .bg_color = BG_WHITE,
+	           .density = 1000000,
+	           .sim_fn = NULL      },
+	[SAND] = { .name = "Sand",
+	           .color = YELLOW,
+	           .bg_color = BG_YELLOW,
+	           .density = 100,
+	           .sim_fn = sim_sand  },
+	[WATER] = { .name = "Water",
+               .color = BLUE,
+               .bg_color = BG_BLUE,
+               .density = 10,
+               .sim_fn = sim_water }
+};
+
+static inline bool can_displace(char moving_cell, char target_cell) {
+	return element_registry[(unsigned char)moving_cell].density >
+	       element_registry[(unsigned char)target_cell].density;
+}
+
+void swap_cells(int x1, int y1, int x2, int y2) {
+	char temp = getCell(x1, y1);
+	set_cell(x1, y1, getCell(x2, y2));
+	set_cell(x2, y2, temp);
+}
+
+void sim_sand(int x, int y) {
+	if (y + 1 >= screen_height)
+		return;
+
+	char below = getCell(x, y + 1);
+
+	// 1. Move straight down (into empty air or lighter liquids like water)
+	if (can_displace(SAND, below)) {
+		swap_cells(x, y, x, y + 1);
+		return;
+	}
+
+	// 2. Pile logic: Choose a random direction diagonal down (left or right)
+	int diag = (rand() % 2 == 0) ? 1 : -1;
+	int new_x = x + diag;
+
+	if (new_x >= 0 && new_x < screen_width) {
+		char diag_below = getCell(new_x, y + 1);
+		if (can_displace(SAND, diag_below)) {
+			swap_cells(x, y, new_x, y + 1);
+			return;
+		}
+	}
+
+	// Try the opposite diagonal direction if the first choice was blocked
+	new_x = x - diag;
+	if (new_x >= 0 && new_x < screen_width) {
+		char diag_below = getCell(new_x, y + 1);
+		if (can_displace(SAND, diag_below)) {
+			swap_cells(x, y, new_x, y + 1);
+			return;
+		}
+	}
+}
+
+static void try_spread_water(int x, int y) {
+	int spread_amount = 10;
+	// Porting Godot's randi_range(1, spread_amount) logic
+	int spread_distance = 1 + (rand() % spread_amount);
+	int dir = (rand() % 2 == 0) ? 1 : -1;
+
+	// Check prime chosen direction
+	int target_x = x;
+	for (int i = 1; i <= spread_distance; i++) {
+		int check_x = x + (dir * i);
+		if (check_x < 0 || check_x >= screen_width)
+			break;
+		if (getCell(check_x, y) != EMPTY)
+			break;
+		target_x = check_x;
+	}
+
+	if (target_x != x) {
+		swap_cells(x, y, target_x, y);
+		return;
+	}
+
+	// Fallback to secondary direction
+	target_x = x;
+	for (int i = 1; i <= spread_distance; i++) {
+		int check_x = x - (dir * i);
+		if (check_x < 0 || check_x >= screen_width)
+			break;
+		if (getCell(check_x, y) != EMPTY)
+			break;
+		target_x = check_x;
+	}
+
+	if (target_x != x) {
+		swap_cells(x, y, target_x, y);
+	}
+}
+
+void sim_water(int x, int y) {
+	// If at the absolute bottom floor, skip down-checks and immediately flow sideways
+	if (y + 1 >= screen_height) {
+		try_spread_water(x, y);
+		return;
+	}
+
+	char below = getCell(x, y + 1);
+
+	// 1. Fall straight down
+	if (can_displace(WATER, below)) {
+		swap_cells(x, y, x, y + 1);
+		return;
+	}
+
+	// 2. Try falling diagonally down (left/right)
+	int diag = (rand() % 2 == 0) ? 1 : -1;
+	int new_x = x + diag;
+
+	if (new_x >= 0 && new_x < screen_width) {
+		char diag_below = getCell(new_x, y + 1);
+		if (can_displace(WATER, diag_below)) {
+			swap_cells(x, y, new_x, y + 1);
+			return;
+		}
+	}
+
+	new_x = x - diag;
+	if (new_x >= 0 && new_x < screen_width) {
+		char diag_below = getCell(new_x, y + 1);
+		if (can_displace(WATER, diag_below)) {
+			swap_cells(x, y, new_x, y + 1);
+			return;
+		}
+	}
+
+	// 3. Spreading step if downward tracks are fully locked out
+	try_spread_water(x, y);
+}
+
+void simulate() {
+	for (int y = screen_height - 1; y >= 0; y--) {
+		for (int x = 0; x < screen_width; x++) {
+			unsigned char cell = getCell(x, y);
+			ElementSimFn sim_fn = element_registry[cell].sim_fn;
+			if (sim_fn != NULL) {
+				sim_fn(x, y);
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char *argv[]) {
 	int opt;
-	int set_width = 100;
-	int set_height = 100;
+	int set_width = 50;
+	int set_height = 50;
 
 	while ((opt = getopt(argc, argv, "w:h:")) != -1) {
 		switch (opt) {
@@ -97,6 +264,7 @@ int main(int argc, char *argv[]) {
 	while (running) {
 		clock_gettime(CLOCK_MONOTONIC, &start_time);
 
+		simulate();
 		render();
 		handle_input();
 
