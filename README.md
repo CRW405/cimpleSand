@@ -6,7 +6,7 @@
 
 This is just a fun project for me to get better with C by tackling an idea I've had floating around in my head for a while.
 
-Simple falling sand sim being rendered by a custom made text based rasterization engine that uses Unicode escape sequences on supporting terminal emulators.
+Simple falling sand sim being rendered by a custom made Unicode based rendering engine that uses Unicode escape sequences on supporting terminal emulators.
 
 ## Build and run
 
