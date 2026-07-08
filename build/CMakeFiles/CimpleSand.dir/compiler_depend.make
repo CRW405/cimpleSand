@@ -5,6 +5,14 @@ CMakeFiles/CimpleSand.dir/src/input.c.o: /home/think/Documents/cimpleSand/src/in
   /home/think/Documents/cimpleSand/src/common.h \
   /home/think/Documents/cimpleSand/src/input.h \
   /usr/include/alloca.h \
+  /usr/include/asm-generic/bitsperlong.h \
+  /usr/include/asm-generic/ioctl.h \
+  /usr/include/asm-generic/ioctls.h \
+  /usr/include/asm-generic/sockios.h \
+  /usr/include/asm/bitsperlong.h \
+  /usr/include/asm/ioctl.h \
+  /usr/include/asm/ioctls.h \
+  /usr/include/asm/sockios.h \
   /usr/include/bits/atomic_wide_counter.h \
   /usr/include/bits/byteswap.h \
   /usr/include/bits/confname.h \
@@ -15,6 +23,8 @@ CMakeFiles/CimpleSand.dir/src/input.c.o: /home/think/Documents/cimpleSand/src/in
   /usr/include/bits/floatn.h \
   /usr/include/bits/getopt_core.h \
   /usr/include/bits/getopt_posix.h \
+  /usr/include/bits/ioctl-types.h \
+  /usr/include/bits/ioctls.h \
   /usr/include/bits/libc-header-start.h \
   /usr/include/bits/long-double.h \
   /usr/include/bits/posix_opt.h \
@@ -94,11 +104,16 @@ CMakeFiles/CimpleSand.dir/src/input.c.o: /home/think/Documents/cimpleSand/src/in
   /usr/include/features.h \
   /usr/include/gnu/stubs-64.h \
   /usr/include/gnu/stubs.h \
+  /usr/include/linux/ioctl.h \
+  /usr/include/linux/sockios.h \
   /usr/include/signal.h \
   /usr/include/stdc-predef.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
+  /usr/include/string.h \
+  /usr/include/strings.h \
   /usr/include/sys/cdefs.h \
+  /usr/include/sys/ioctl.h \
   /usr/include/sys/select.h \
   /usr/include/sys/ttydefaults.h \
   /usr/include/sys/types.h \
@@ -116,6 +131,14 @@ CMakeFiles/CimpleSand.dir/src/main.c.o: /home/think/Documents/cimpleSand/src/mai
   /home/think/Documents/cimpleSand/src/render.h \
   /home/think/Documents/cimpleSand/src/term_ops.h \
   /usr/include/alloca.h \
+  /usr/include/asm-generic/bitsperlong.h \
+  /usr/include/asm-generic/ioctl.h \
+  /usr/include/asm-generic/ioctls.h \
+  /usr/include/asm-generic/sockios.h \
+  /usr/include/asm/bitsperlong.h \
+  /usr/include/asm/ioctl.h \
+  /usr/include/asm/ioctls.h \
+  /usr/include/asm/sockios.h \
   /usr/include/bits/atomic_wide_counter.h \
   /usr/include/bits/byteswap.h \
   /usr/include/bits/confname.h \
@@ -126,6 +149,8 @@ CMakeFiles/CimpleSand.dir/src/main.c.o: /home/think/Documents/cimpleSand/src/mai
   /usr/include/bits/floatn.h \
   /usr/include/bits/getopt_core.h \
   /usr/include/bits/getopt_posix.h \
+  /usr/include/bits/ioctl-types.h \
+  /usr/include/bits/ioctls.h \
   /usr/include/bits/libc-header-start.h \
   /usr/include/bits/long-double.h \
   /usr/include/bits/posix_opt.h \
@@ -205,11 +230,16 @@ CMakeFiles/CimpleSand.dir/src/main.c.o: /home/think/Documents/cimpleSand/src/mai
   /usr/include/features.h \
   /usr/include/gnu/stubs-64.h \
   /usr/include/gnu/stubs.h \
+  /usr/include/linux/ioctl.h \
+  /usr/include/linux/sockios.h \
   /usr/include/signal.h \
   /usr/include/stdc-predef.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
+  /usr/include/string.h \
+  /usr/include/strings.h \
   /usr/include/sys/cdefs.h \
+  /usr/include/sys/ioctl.h \
   /usr/include/sys/select.h \
   /usr/include/sys/ttydefaults.h \
   /usr/include/sys/types.h \
@@ -226,6 +256,14 @@ CMakeFiles/CimpleSand.dir/src/render.c.o: /home/think/Documents/cimpleSand/src/r
   /home/think/Documents/cimpleSand/src/render.h \
   /home/think/Documents/cimpleSand/src/term_ops.h \
   /usr/include/alloca.h \
+  /usr/include/asm-generic/bitsperlong.h \
+  /usr/include/asm-generic/ioctl.h \
+  /usr/include/asm-generic/ioctls.h \
+  /usr/include/asm-generic/sockios.h \
+  /usr/include/asm/bitsperlong.h \
+  /usr/include/asm/ioctl.h \
+  /usr/include/asm/ioctls.h \
+  /usr/include/asm/sockios.h \
   /usr/include/bits/atomic_wide_counter.h \
   /usr/include/bits/byteswap.h \
   /usr/include/bits/confname.h \
@@ -236,6 +274,8 @@ CMakeFiles/CimpleSand.dir/src/render.c.o: /home/think/Documents/cimpleSand/src/r
   /usr/include/bits/floatn.h \
   /usr/include/bits/getopt_core.h \
   /usr/include/bits/getopt_posix.h \
+  /usr/include/bits/ioctl-types.h \
+  /usr/include/bits/ioctls.h \
   /usr/include/bits/libc-header-start.h \
   /usr/include/bits/long-double.h \
   /usr/include/bits/posix_opt.h \
@@ -315,11 +355,16 @@ CMakeFiles/CimpleSand.dir/src/render.c.o: /home/think/Documents/cimpleSand/src/r
   /usr/include/features.h \
   /usr/include/gnu/stubs-64.h \
   /usr/include/gnu/stubs.h \
+  /usr/include/linux/ioctl.h \
+  /usr/include/linux/sockios.h \
   /usr/include/signal.h \
   /usr/include/stdc-predef.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
+  /usr/include/string.h \
+  /usr/include/strings.h \
   /usr/include/sys/cdefs.h \
+  /usr/include/sys/ioctl.h \
   /usr/include/sys/select.h \
   /usr/include/sys/ttydefaults.h \
   /usr/include/sys/types.h \
@@ -335,6 +380,14 @@ CMakeFiles/CimpleSand.dir/src/term_ops.c.o: /home/think/Documents/cimpleSand/src
   /home/think/Documents/cimpleSand/src/common.h \
   /home/think/Documents/cimpleSand/src/term_ops.h \
   /usr/include/alloca.h \
+  /usr/include/asm-generic/bitsperlong.h \
+  /usr/include/asm-generic/ioctl.h \
+  /usr/include/asm-generic/ioctls.h \
+  /usr/include/asm-generic/sockios.h \
+  /usr/include/asm/bitsperlong.h \
+  /usr/include/asm/ioctl.h \
+  /usr/include/asm/ioctls.h \
+  /usr/include/asm/sockios.h \
   /usr/include/bits/atomic_wide_counter.h \
   /usr/include/bits/byteswap.h \
   /usr/include/bits/confname.h \
@@ -345,6 +398,8 @@ CMakeFiles/CimpleSand.dir/src/term_ops.c.o: /home/think/Documents/cimpleSand/src
   /usr/include/bits/floatn.h \
   /usr/include/bits/getopt_core.h \
   /usr/include/bits/getopt_posix.h \
+  /usr/include/bits/ioctl-types.h \
+  /usr/include/bits/ioctls.h \
   /usr/include/bits/libc-header-start.h \
   /usr/include/bits/long-double.h \
   /usr/include/bits/posix_opt.h \
@@ -424,11 +479,16 @@ CMakeFiles/CimpleSand.dir/src/term_ops.c.o: /home/think/Documents/cimpleSand/src
   /usr/include/features.h \
   /usr/include/gnu/stubs-64.h \
   /usr/include/gnu/stubs.h \
+  /usr/include/linux/ioctl.h \
+  /usr/include/linux/sockios.h \
   /usr/include/signal.h \
   /usr/include/stdc-predef.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
+  /usr/include/string.h \
+  /usr/include/strings.h \
   /usr/include/sys/cdefs.h \
+  /usr/include/sys/ioctl.h \
   /usr/include/sys/select.h \
   /usr/include/sys/ttydefaults.h \
   /usr/include/sys/types.h \
@@ -467,49 +527,43 @@ CMakeFiles/CimpleSand.dir/src/input.c.o:
 
 /usr/lib/libc_nonshared.a:
 
-/usr/include/bits/types/__FILE.h:
+/usr/lib/libc.so.6:
 
-/home/think/Documents/cimpleSand/src/input.c:
+/usr/lib/ld-linux-x86-64.so.2:
 
-/usr/include/bits/types/FILE.h:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s.so:
 
-/usr/include/bits/termios.h:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a:
 
-/usr/include/bits/types.h:
+CMakeFiles/CimpleSand.dir/src/main.c.o:
 
-/usr/include/bits/siginfo-arch.h:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s_asneeded.so:
+
+/usr/lib/libc.so:
+
+/home/think/Documents/cimpleSand/src/term_ops.c:
 
 /usr/include/bits/sigaction.h:
-
-/usr/include/bits/getopt_core.h:
-
-/usr/include/bits/sigstack.h:
-
-/usr/include/bits/termios-misc.h:
-
-/usr/include/bits/types/sigset_t.h:
 
 /usr/include/bits/termios-cbaud.h:
 
 /usr/include/bits/termios-c_oflag.h:
 
-/usr/include/bits/termios-struct.h:
-
-/usr/include/bits/termios-c_lflag.h:
-
-/usr/include/bits/floatn-common.h:
-
 /usr/include/bits/termios-c_cflag.h:
+
+/usr/include/asm-generic/ioctls.h:
 
 /usr/include/bits/termios-c_cc.h:
 
 /usr/include/bits/types/time_t.h:
 
-/usr/include/bits/termios-baud.h:
-
-/usr/include/stdlib.h:
-
 /usr/include/bits/termios-tcflow.h:
+
+/usr/include/bits/types/__FILE.h:
 
 /usr/include/bits/stdlib-bsearch.h:
 
@@ -519,65 +573,65 @@ CMakeFiles/CimpleSand.dir/src/input.c.o:
 
 /home/think/Documents/cimpleSand/src/input.h:
 
-/usr/include/bits/long-double.h:
+/usr/lib/crtn.o:
 
-/usr/include/bits/floatn.h:
-
-/usr/include/bits/stdlib-float.h:
-
-/usr/include/bits/time64.h:
-
-/usr/include/bits/byteswap.h:
-
-/usr/include/bits/endian.h:
-
-/usr/include/bits/types/__sigval_t.h:
-
-/usr/include/alloca.h:
-
-/usr/include/bits/sigthread.h:
-
-/usr/include/bits/posix_opt.h:
-
-/usr/include/bits/atomic_wide_counter.h:
-
-/usr/include/sys/select.h:
+/usr/include/bits/sigstksz.h:
 
 /usr/include/bits/stdio.h:
 
 /usr/include/bits/unistd_ext.h:
 
-/usr/include/bits/thread-shared-types.h:
-
-/usr/include/bits/getopt_posix.h:
-
-CMakeFiles/CimpleSand.dir/src/render.c.o:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdarg.h:
+/usr/include/bits/types/struct_timeval.h:
 
 /usr/include/bits/siginfo-consts.h:
 
-/usr/include/gnu/stubs.h:
-
-/usr/include/bits/pthreadtypes-arch.h:
-
-/usr/include/stdc-predef.h:
-
 /usr/include/bits/sigcontext.h:
 
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s.so:
-
-/usr/include/bits/types/__fpos64_t.h:
+/usr/include/asm/bitsperlong.h:
 
 /usr/include/bits/select.h:
 
-/usr/include/bits/pthreadtypes.h:
+/usr/include/asm/sockios.h:
+
+/usr/include/bits/termios-misc.h:
+
+/usr/include/asm/ioctl.h:
+
+/usr/include/bits/termios-baud.h:
+
+/usr/include/stdlib.h:
 
 /usr/include/bits/types/struct_timespec.h:
 
-/usr/include/bits/types/struct_timeval.h:
+/usr/include/bits/pthreadtypes.h:
 
-/home/think/Documents/cimpleSand/src/common.h:
+/usr/include/bits/termios-struct.h:
+
+/usr/include/bits/termios-c_lflag.h:
+
+/usr/include/bits/floatn-common.h:
+
+/usr/include/bits/types/sigset_t.h:
+
+/usr/include/asm-generic/sockios.h:
+
+/usr/include/asm-generic/bitsperlong.h:
+
+/usr/include/alloca.h:
+
+/usr/include/bits/sigthread.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/types/__sigval_t.h:
+
+/usr/include/bits/atomic_wide_counter.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/lib/libgcc_s.so.1:
+
+/usr/include/bits/confname.h:
 
 /usr/include/bits/signum-arch.h:
 
@@ -589,6 +643,8 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/bits/types/struct_sigstack.h:
 
+/home/think/Documents/cimpleSand/src/common.h:
+
 /home/think/Documents/cimpleSand/src/term_ops.h:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.a:
@@ -598,6 +654,58 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 /usr/include/bits/signum-generic.h:
 
 /usr/include/gnu/stubs-64.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/bits/floatn.h:
+
+/usr/include/bits/ioctl-types.h:
+
+/usr/include/bits/thread-shared-types.h:
+
+/usr/include/linux/sockios.h:
+
+/usr/include/asm/ioctls.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o:
+
+/usr/include/bits/environments.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/siginfo-arch.h:
+
+/usr/include/bits/sigstack.h:
+
+/usr/include/bits/getopt_core.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/long-double.h:
+
+/usr/include/bits/getopt_posix.h:
+
+CMakeFiles/CimpleSand.dir/src/render.c.o:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdarg.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/bits/pthreadtypes-arch.h:
+
+/usr/include/stdc-predef.h:
+
+/usr/include/bits/termios.h:
+
+/usr/include/bits/stdlib-float.h:
+
+/usr/include/bits/time64.h:
+
+/usr/include/string.h:
+
+/usr/include/bits/types/FILE.h:
+
+/usr/include/bits/types/__fpos64_t.h:
 
 /usr/include/bits/types/__locale_t.h:
 
@@ -612,6 +720,8 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stddef.h:
 
 /usr/include/bits/types/__sigset_t.h:
+
+/usr/include/bits/ioctls.h:
 
 /usr/include/bits/types/__fpos_t.h:
 
@@ -629,17 +739,15 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/bits/types/once_flag.h:
 
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a:
-
 /usr/include/bits/types/sigevent_t.h:
+
+/usr/include/asm-generic/ioctl.h:
 
 /usr/include/bits/types/siginfo_t.h:
 
+/usr/include/linux/ioctl.h:
+
 /usr/include/bits/types/sigval_t.h:
-
-/usr/include/bits/environments.h:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o:
 
 /usr/include/bits/ss_flags.h:
 
@@ -653,11 +761,15 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/bits/types/struct_tm.h:
 
+/usr/lib/Scrt1.o:
+
+/usr/include/bits/types/timer_t.h:
+
 /usr/include/stdio.h:
 
-/usr/include/bits/types/sig_atomic_t.h:
-
 /usr/lib/crti.o:
+
+/usr/include/bits/types/sig_atomic_t.h:
 
 /usr/include/bits/typesizes.h:
 
@@ -669,9 +781,9 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/sys/ucontext.h:
 
-/home/think/Documents/cimpleSand/src/render.c:
-
 /usr/include/bits/timesize.h:
+
+/home/think/Documents/cimpleSand/src/render.c:
 
 /usr/include/bits/waitstatus.h:
 
@@ -685,7 +797,13 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 
 /usr/include/signal.h:
 
+/usr/include/strings.h:
+
 /usr/include/sys/cdefs.h:
+
+/home/think/Documents/cimpleSand/src/input.c:
+
+/usr/include/sys/ioctl.h:
 
 /usr/include/termios.h:
 
@@ -696,31 +814,3 @@ CMakeFiles/CimpleSand.dir/src/render.c.o:
 /usr/include/bits/types/clockid_t.h:
 
 /home/think/Documents/cimpleSand/src/main.c:
-
-/home/think/Documents/cimpleSand/src/term_ops.c:
-
-/usr/include/bits/types/timer_t.h:
-
-/usr/lib/Scrt1.o:
-
-/usr/include/bits/sigstksz.h:
-
-/usr/lib/crtn.o:
-
-CMakeFiles/CimpleSand.dir/src/main.c.o:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s_asneeded.so:
-
-/usr/lib/libc.so:
-
-/usr/include/bits/confname.h:
-
-/usr/lib/libgcc_s.so.1:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o:
-
-/usr/lib/ld-linux-x86-64.so.2:
-
-/usr/lib/libc.so.6:

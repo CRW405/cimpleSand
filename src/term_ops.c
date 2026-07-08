@@ -32,3 +32,15 @@ Termios enable_raw_term() {
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 	return orig;
 }
+
+bool get_terminal_bounds(int *width, int *height) {
+	struct winsize ws;
+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) != 0 || ws.ws_col == 0 ||
+	    ws.ws_row <= 1) {
+		return false;
+	}
+
+	*width = ws.ws_col;
+	*height = (ws.ws_row - 1) * 2;
+	return true;
+}

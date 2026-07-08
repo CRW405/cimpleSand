@@ -43,20 +43,27 @@ CMakeFiles/CimpleSand.dir/src/main.c.o: \
  /usr/include/bits/select.h /usr/include/bits/types/struct_timeval.h \
  /usr/include/alloca.h /usr/include/bits/stdlib-bsearch.h \
  /usr/include/bits/types/once_flag.h /usr/include/bits/stdlib-float.h \
+ /usr/include/string.h /usr/include/bits/types/locale_t.h \
+ /usr/include/bits/types/__locale_t.h /usr/include/strings.h \
+ /usr/include/sys/ioctl.h /usr/include/bits/ioctls.h \
+ /usr/include/asm/ioctls.h /usr/include/asm-generic/ioctls.h \
+ /usr/include/linux/ioctl.h /usr/include/asm/ioctl.h \
+ /usr/include/asm-generic/ioctl.h /usr/include/linux/sockios.h \
+ /usr/include/asm/bitsperlong.h /usr/include/asm-generic/bitsperlong.h \
+ /usr/include/asm/sockios.h /usr/include/asm-generic/sockios.h \
+ /usr/include/bits/ioctl-types.h /usr/include/sys/ttydefaults.h \
  /usr/include/termios.h /usr/include/bits/termios.h \
  /usr/include/bits/termios-struct.h /usr/include/bits/termios-c_cc.h \
  /usr/include/bits/termios-c_iflag.h /usr/include/bits/termios-c_oflag.h \
  /usr/include/bits/termios-c_cflag.h /usr/include/bits/termios-cbaud.h \
  /usr/include/bits/termios-c_lflag.h /usr/include/bits/termios-tcflow.h \
  /usr/include/bits/termios-misc.h /usr/include/bits/termios-baud.h \
- /usr/include/sys/ttydefaults.h /usr/include/time.h \
- /usr/include/bits/time.h /usr/include/bits/types/struct_tm.h \
- /usr/include/bits/types/struct_itimerspec.h \
- /usr/include/bits/types/locale_t.h /usr/include/bits/types/__locale_t.h \
- /usr/include/unistd.h /usr/include/bits/posix_opt.h \
- /usr/include/bits/environments.h /usr/include/bits/confname.h \
- /usr/include/bits/getopt_posix.h /usr/include/bits/getopt_core.h \
- /usr/include/bits/unistd_ext.h \
+ /usr/include/time.h /usr/include/bits/time.h \
+ /usr/include/bits/types/struct_tm.h \
+ /usr/include/bits/types/struct_itimerspec.h /usr/include/unistd.h \
+ /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+ /usr/include/bits/confname.h /usr/include/bits/getopt_posix.h \
+ /usr/include/bits/getopt_core.h /usr/include/bits/unistd_ext.h \
  /home/think/Documents/cimpleSand/src/input.h \
  /home/think/Documents/cimpleSand/src/render.h \
  /home/think/Documents/cimpleSand/src/term_ops.h

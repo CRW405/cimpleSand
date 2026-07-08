@@ -6,5 +6,6 @@ void term_op(int op_count, bool flush, ...);
 void init_screen(void);
 void reset_term(void);
 Termios enable_raw_term(void);
+bool get_terminal_bounds(int *width, int *height);
 
 #endif

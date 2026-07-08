@@ -6,13 +6,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
 
 #define TARGET_FPS 120
-#define FRAME_TIME (1000000 / TARGET_FPS)
 
 #define EMPTY 0
 #define WALL 1
@@ -63,6 +64,7 @@ extern unsigned char *grid;
 extern char *frame_buffer;
 extern int frame_buffer_size;
 extern int fps;
+extern int target_fps;
 extern int cell_count;
 extern char last_input;
 extern int mouse_x;

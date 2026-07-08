@@ -3,9 +3,21 @@
 static char input_char;
 static int mouse_button;
 static char mouse_event_type;
+static bool left_mouse_held = false;
+static bool right_mouse_held = false;
+static bool has_mouse_position = false;
 
 extern void set_cell(int x, int y, char cell);
 extern void paint(int x_center, int y_center, int radius, char cell);
+
+static void paint_at_cursor(char cell) {
+	if (cur_radius > 1) {
+		paint(sim_mouse_x, sim_mouse_y, cur_radius, cell);
+		return;
+	}
+	set_cell(sim_mouse_x, sim_mouse_y, cell);
+	set_cell(sim_mouse_x, sim_mouse_y + 1, cell);
+}
 
 int isInput() {
 	Timeval timeout = { 0, 0 };
@@ -58,31 +70,22 @@ void handle_input() {
 					mouse_button = tmpbtn;
 					mouse_x = tmpx;
 					mouse_y = tmpy;
+					has_mouse_position = true;
 
 					sim_mouse_x = mouse_x - 1;
 					sim_mouse_y = ((mouse_y - 1) * 2);
 
+					int button_id = mouse_button & 0b11;
 					if (mouse_event_type == 'M') {
-						if (mouse_button == 0 || mouse_button == 32) {
-							if (cur_radius > 1) {
-								paint(sim_mouse_x, sim_mouse_y, cur_radius,
-								      current_cell);
-							} else {
-								set_cell(sim_mouse_x, sim_mouse_y,
-								         current_cell);
-								set_cell(sim_mouse_x, sim_mouse_y + 1,
-								         current_cell);
-							}
-						}
-						if (mouse_button == 2 || mouse_button == 34) {
-							if (cur_radius > 1) {
-								paint(sim_mouse_x, sim_mouse_y, cur_radius,
-								      EMPTY);
-							} else {
-								set_cell(sim_mouse_x, sim_mouse_y, EMPTY);
-								set_cell(sim_mouse_x, sim_mouse_y + 1, EMPTY);
-							}
-						}
+						if (button_id == 0)
+							left_mouse_held = true;
+						if (button_id == 2)
+							right_mouse_held = true;
+					} else if (mouse_event_type == 'm') {
+						if (button_id == 0 || button_id == 3)
+							left_mouse_held = false;
+						if (button_id == 2 || button_id == 3)
+							right_mouse_held = false;
 					}
 				}
 				last_input = mouse_event_type;
@@ -112,6 +115,15 @@ void handle_input() {
 				break;
 			}
 			last_input = input_char;
+		}
+	}
+
+	if (has_mouse_position) {
+		if (left_mouse_held) {
+			paint_at_cursor(current_cell);
+		}
+		if (right_mouse_held) {
+			paint_at_cursor(EMPTY);
 		}
 	}
 }

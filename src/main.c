@@ -12,6 +12,7 @@ unsigned char *grid;
 char *frame_buffer;
 int frame_buffer_size;
 int fps;
+int target_fps = TARGET_FPS;
 int cell_count;
 char last_input = ' ';
 int mouse_x = 0;
@@ -28,7 +29,7 @@ void handle_sigint(int sig) {
 void init_grid(int width, int height) {
 	screen_width = width;
 	screen_height = (height % 2 == 0) ? height : height + 1;
-	grid_size = width * height;
+	grid_size = screen_width * screen_height;
 	grid = calloc(grid_size, sizeof(unsigned char));
 	frame_buffer_size = (grid_size * 25) + 256;
 	frame_buffer = malloc(frame_buffer_size);
@@ -235,17 +236,42 @@ void simulate() {
 
 int main(int argc, char *argv[]) {
 	int opt;
-	int set_width = 50;
-	int set_height = 50;
+	int set_width = 1;
+	int set_height = 1;
+	bool width_set = false;
+	bool height_set = false;
+	int term_width = 0;
+	int term_height = 0;
 
-	while ((opt = getopt(argc, argv, "w:h:")) != -1) {
+	while ((opt = getopt(argc, argv, "w:h:f:")) != -1) {
 		switch (opt) {
 		case 'w':
-			set_width = atoi(optarg);
+			set_width = atoi(optarg) > 1 ? atoi(optarg) : set_width;
+			width_set = true;
 			break;
 		case 'h':
-			set_height = atoi(optarg);
+			set_height = atoi(optarg) > 1 ? atoi(optarg) : set_height;
+			height_set = true;
 			break;
+		case 'f':
+			target_fps = atoi(optarg) != 0 ? atoi(optarg) : TARGET_FPS;
+			break;
+		}
+	}
+
+	if (get_terminal_bounds(&term_width, &term_height)) {
+		if (!width_set) {
+			set_width = term_width;
+		}
+		if (!height_set) {
+			set_height = term_height;
+		}
+
+		if (set_width > term_width) {
+			set_width = term_width;
+		}
+		if (set_height > term_height) {
+			set_height = term_height;
 		}
 	}
 
@@ -273,8 +299,9 @@ int main(int argc, char *argv[]) {
 
 		total_frame_time = elapsed_time;
 
-		if (elapsed_time < FRAME_TIME) {
-			sleep_time = FRAME_TIME - elapsed_time;
+		int frame_time = 1000000 / target_fps;
+		if (elapsed_time < frame_time) {
+			sleep_time = frame_time - elapsed_time;
 			usleep(sleep_time);
 			total_frame_time += sleep_time;
 		}

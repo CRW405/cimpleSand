@@ -33,8 +33,16 @@ cmake --build build
 Optional grid size:
 
 ```bash
-./build/CimpleSand -w 100 -h 100 # Larger sizes may not render correctly on your terminal, with a max zoom kitty terminal I cannot go above 200x200 without issues
+./build/CimpleSand -w 100 -h 100 # or some n. The actual width is clamped from 1 to the screen width or height
 ```
+
+Optional FPS target:
+
+```bash
+./build/CimpleSand -f 120 # will affect simulation speed. Set to a negative number for uncapped, 0 sets to default
+```
+
+If `-w` / `-h` are omitted, the simulation now auto-fits to terminal bounds.
 
 ## Controls
 
@@ -90,12 +98,6 @@ src/
 - Smart Simulating, simulate only active areas
 - Better / faster water settling
 - More elements: Fire, Stone, Steam, Lava, Life
+- Dirty rendering
 
 ### TODO:
-
-- more opts: fps target
-- Make it so that holding click doesnt require movement to trigger paint()
-- Make the cell count work
-- Get terminal bounds?
-- Fix the UI buffer not clearing problem at brush size section
-- Add a current element name readout to UI
