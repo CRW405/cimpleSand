@@ -15,7 +15,7 @@ Simple falling sand sim being rendered by a custom made Unicode based rendering 
 - C compiler (GCC/Clang)
 - CMake 3.10+
 - Linux/macOS terminal with ANSI + mouse reporting support. (I used kitty to develop this)
-Not sure how you would / if you can run this on windows but maybe try WSL?
+    - Not sure how you would / if you can run this on windows but maybe try WSL?
 
 ### Build
 
@@ -75,6 +75,13 @@ src/
   term_ops.c   # terminal mode setup/teardown and ANSI op helpers
   common.h     # shared constants, globals, types, escape codes
 ```
+
+## Issues
+
+- The rendering is broken / stripey or the brush is not where your mouse is.
+    - Try zooming out the terminal or trying a smaller -w and -h.
+- The brush size says its larger than it actually is.
+    - I'll fix this eventually, I just need to clear the UI buffer correctly.
 
 ## Notes
 
