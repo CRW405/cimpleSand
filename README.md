@@ -86,11 +86,6 @@ src/
 
 ## Issues
 
-- The rendering is broken / stripey or the brush is not where your mouse is.
-    - Try zooming out the terminal or trying a smaller -w and -h.
-- The brush size says its larger than it actually is.
-    - I'll fix this eventually, I just need to clear the UI buffer correctly.
-
 ## Notes
 
 ### Planned Improvements
