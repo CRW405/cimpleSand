@@ -181,9 +181,7 @@ static void try_spread_water(int x, int y) {
 }
 
 void sim_water(int x, int y) {
-	// If at the absolute bottom floor, skip down-checks and immediately flow sideways
 	if (y + 1 >= screen_height) {
-		try_spread_water(x, y);
 		return;
 	}
 
@@ -221,12 +219,25 @@ void sim_water(int x, int y) {
 }
 
 void simulate() {
+	static unsigned frame = 0;
+	frame++;
+
 	for (int y = screen_height - 1; y >= 0; y--) {
-		for (int x = 0; x < screen_width; x++) {
-			unsigned char cell = getCell(x, y);
-			ElementSimFn sim_fn = element_registry[cell].sim_fn;
-			if (sim_fn != NULL) {
-				sim_fn(x, y);
+		if (frame & 1) {
+			for (int x = 0; x < screen_width; x++) {
+				unsigned char cell = getCell(x, y);
+				ElementSimFn sim_fn = element_registry[cell].sim_fn;
+				if (sim_fn) {
+					sim_fn(x, y);
+				}
+			}
+		} else {
+			for (int x = screen_width - 1; x >= 0; x--) {
+				unsigned char cell = getCell(x, y);
+				ElementSimFn sim_fn = element_registry[cell].sim_fn;
+				if (sim_fn) {
+					sim_fn(x, y);
+				}
 			}
 		}
 	}
@@ -285,6 +296,8 @@ int main(int argc, char *argv[]) {
 	long elapsed_time;
 	long total_frame_time;
 	long sleep_time;
+
+	srand((unsigned)time(NULL));
 
 	while (running) {
 		clock_gettime(CLOCK_MONOTONIC, &start_time);
