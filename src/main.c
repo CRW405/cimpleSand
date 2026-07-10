@@ -73,6 +73,7 @@ void paint(int x_center, int y_center, int radius, char cell) {
 
 void sim_sand(int x, int y);
 void sim_water(int x, int y);
+void sim_stone(int x, int y);
 
 const Element element_registry[] = {
 	[EMPTY] = { .name = "Empty",
@@ -90,6 +91,11 @@ const Element element_registry[] = {
 	           .bg_color = BG_YELLOW,
 	           .density = 100,
 	           .sim_fn = sim_sand  },
+	[STONE] = { .name = "Stone",
+               .color = GRAY,
+               .bg_color = BG_GRAY,
+               .density = 200,
+               .sim_fn = sim_stone },
 	[WATER] = { .name = "Water",
                .color = BLUE,
                .bg_color = BG_BLUE,
@@ -141,6 +147,38 @@ void sim_sand(int x, int y) {
 			return;
 		}
 	}
+}
+
+void sim_stone(int x, int y) {
+	if (y + 1 >= screen_height)
+		return;
+
+	char below = getCell(x, y + 1);
+
+	if (can_displace(STONE, below)) {
+		swap_cells(x, y, x, y + 1);
+		return;
+	}
+
+	// int diag = (rand() % 2 == 0) ? 1 : -1;
+	// int new_x = x + diag;
+	//
+	// if (new_x >= 0 && new_x < screen_width) {
+	// 	char diag_below = getCell(new_x, y + 1);
+	// 	if (can_displace(STONE, diag_below)) {
+	// 		swap_cells(x, y, new_x, y + 1);
+	// 		return;
+	// 	}
+	// }
+
+	// new_x = x - diag;
+	// if (new_x >= 0 && new_x < screen_width) {
+	// 	char diag_below = getCell(new_x, y + 1);
+	// 	if (can_displace(STONE, diag_below)) {
+	// 		swap_cells(x, y, new_x, y + 1);
+	// 		return;
+	// 	}
+	// }
 }
 
 static void try_spread_water(int x, int y) {

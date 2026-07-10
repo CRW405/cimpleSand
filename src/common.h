@@ -19,6 +19,7 @@
 #define WALL 1
 #define SAND 2
 #define WATER 3
+#define STONE 4
 
 #define CLEAR "\e[2J"
 #define CUR_TO_TOP "\e[H"
@@ -41,6 +42,7 @@
 #define BG_MAGENTA "\e[45m"
 #define BG_CYAN "\e[46m"
 #define BG_WHITE "\e[47m"
+#define BG_GRAY "\e[48;5;240m"
 #define BLACK "\e[30m"
 #define RED "\e[31m"
 #define GREEN "\e[32m"
@@ -49,6 +51,7 @@
 #define MAGENTA "\e[35m"
 #define CYAN "\e[36m"
 #define WHITE "\e[37m"
+#define GRAY "\e[38;5;240m"
 #define RESET_STYLE "\e[0m"
 
 typedef struct termios Termios;
