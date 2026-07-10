@@ -13,7 +13,6 @@ char *frame_buffer;
 int frame_buffer_size;
 int fps;
 int target_fps = TARGET_FPS;
-int cell_count;
 char last_input = ' ';
 int mouse_x = 0;
 int mouse_y = 0;
@@ -33,6 +32,13 @@ void init_grid(int width, int height) {
 	grid = calloc(grid_size, sizeof(unsigned char));
 	frame_buffer_size = (grid_size * 25) + 256;
 	frame_buffer = malloc(frame_buffer_size);
+
+	if (!grid || !frame_buffer) {
+		free(grid);
+		free(frame_buffer);
+		fprintf(stderr, "Failed to allocate simulation buffers.\n");
+		exit(EXIT_FAILURE);
+	}
 }
 
 char getCell(int x, int y) {
@@ -94,7 +100,7 @@ const Element element_registry[] = {
 	[STONE] = { .name = "Stone",
                .color = GRAY,
                .bg_color = BG_GRAY,
-               .density = 200,
+               .density = 100,
                .sim_fn = sim_stone },
 	[WATER] = { .name = "Water",
                .color = BLUE,
@@ -159,26 +165,6 @@ void sim_stone(int x, int y) {
 		swap_cells(x, y, x, y + 1);
 		return;
 	}
-
-	// int diag = (rand() % 2 == 0) ? 1 : -1;
-	// int new_x = x + diag;
-	//
-	// if (new_x >= 0 && new_x < screen_width) {
-	// 	char diag_below = getCell(new_x, y + 1);
-	// 	if (can_displace(STONE, diag_below)) {
-	// 		swap_cells(x, y, new_x, y + 1);
-	// 		return;
-	// 	}
-	// }
-
-	// new_x = x - diag;
-	// if (new_x >= 0 && new_x < screen_width) {
-	// 	char diag_below = getCell(new_x, y + 1);
-	// 	if (can_displace(STONE, diag_below)) {
-	// 		swap_cells(x, y, new_x, y + 1);
-	// 		return;
-	// 	}
-	// }
 }
 
 static void try_spread_water(int x, int y) {

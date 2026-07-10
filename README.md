@@ -52,6 +52,7 @@ If `-w` / `-h` are omitted, the simulation now auto-fits to terminal bounds.
 | `1` | Select Wall |
 | `2` | Select Sand |
 | `3` | Select Water |
+| `4` | Select Stone |
 | `-` / `_` | Decrease brush size |
 | `+` / `=` | Increase brush size |
 | Left click / drag | Paint selected material |
@@ -92,7 +93,10 @@ src/
 
 - Smart Simulating, simulate only active areas
 - Better / faster water settling
-- More elements: Fire, Stone, Steam, Lava, Life
+- More elements: Fire, Steam, Lava, Life
 - Dirty rendering
 
 ### TODO:
+
+- Optimize the render hot path (`render.c`) by reducing per-cell formatting/output overhead.
+- Optimize simulation inner loops (`simulate` / `sim_*`) to cut repeated cell access and bounds-check cost.

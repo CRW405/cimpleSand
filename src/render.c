@@ -2,9 +2,8 @@
 #include "term_ops.h"
 
 static char gui_buffer[256];
-int frame_buffer_offset;
 
-char *gui() {
+static char *gui(int cell_count) {
 	snprintf(gui_buffer, sizeof(gui_buffer),
 	         "FPS: %d/%d | Cells: %d | Last Input: %c | Mouse: %d, %d (%d) | "
 	         "Selected: %d (%s) | Brush Size: %d\e[K",
@@ -15,9 +14,10 @@ char *gui() {
 }
 
 void render() {
+	int frame_buffer_offset = 0;
+	int cell_count = 0;
+
 	term_op(1, false, CUR_TO_TOP);
-	frame_buffer_offset = 0;
-	cell_count = 0;
 
 	for (int y = 0; y < screen_height; y += 2) {
 		for (int x = 0; x < screen_width; x++) {
@@ -44,7 +44,7 @@ void render() {
 	}
 	frame_buffer_offset +=
 	    snprintf(frame_buffer + frame_buffer_offset,
-	             frame_buffer_size - frame_buffer_offset, "%s", gui());
+	             frame_buffer_size - frame_buffer_offset, "%s", gui(cell_count));
 	if (frame_buffer_offset >= frame_buffer_size) {
 		frame_buffer[frame_buffer_size - 1] = '\0';
 	} else {

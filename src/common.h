@@ -68,7 +68,6 @@ extern char *frame_buffer;
 extern int frame_buffer_size;
 extern int fps;
 extern int target_fps;
-extern int cell_count;
 extern char last_input;
 extern int mouse_x;
 extern int mouse_y;
