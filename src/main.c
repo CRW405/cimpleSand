@@ -127,30 +127,32 @@ void sim_sand(int x, int y) {
 	if (y + 1 >= screen_height)
 		return;
 
-	char below = getCell(x, y + 1);
+	int base_index = (y * screen_width) + x;
+	int below_index = base_index + screen_width;
+	char below = grid[below_index] & ACTIVE_MASK;
 
-	// 1. Move straight down (into empty air or lighter liquids like water)
+	// 1. Move straight down
 	if (can_displace(SAND, below)) {
 		swap_cells(x, y, x, y + 1);
 		return;
 	}
 
-	// 2. Pile logic: Choose a random direction diagonal down (left or right)
+	// 2. Pile logic: Choose a random diagonal direction down
 	int diag = (rand() % 2 == 0) ? 1 : -1;
 	int new_x = x + diag;
 
 	if (new_x >= 0 && new_x < screen_width) {
-		char diag_below = getCell(new_x, y + 1);
+		char diag_below = grid[below_index + diag] & ACTIVE_MASK;
 		if (can_displace(SAND, diag_below)) {
 			swap_cells(x, y, new_x, y + 1);
 			return;
 		}
 	}
 
-	// Try the opposite diagonal direction if the first choice was blocked
+	// Try opposite diagonal direction if first choice was blocked
 	new_x = x - diag;
 	if (new_x >= 0 && new_x < screen_width) {
-		char diag_below = getCell(new_x, y + 1);
+		char diag_below = grid[below_index - diag] & ACTIVE_MASK;
 		if (can_displace(SAND, diag_below)) {
 			swap_cells(x, y, new_x, y + 1);
 			return;
@@ -162,7 +164,8 @@ void sim_stone(int x, int y) {
 	if (y + 1 >= screen_height)
 		return;
 
-	char below = getCell(x, y + 1);
+	int base_index = (y * screen_width) + x;
+	char below = grid[base_index + screen_width] & ACTIVE_MASK;
 
 	if (can_displace(STONE, below)) {
 		swap_cells(x, y, x, y + 1);
@@ -174,14 +177,15 @@ static void try_spread_water(int x, int y) {
 	int spread_amount = 10;
 	int spread_distance = 1 + (rand() % spread_amount);
 	int dir = (rand() % 2 == 0) ? 1 : -1;
+	int base_index = (y * screen_width) + x;
 
-	// Check prime chosen direction
+	// Check primary chosen direction
 	int target_x = x;
 	for (int i = 1; i <= spread_distance; i++) {
 		int check_x = x + (dir * i);
 		if (check_x < 0 || check_x >= screen_width)
 			break;
-		if (getCell(check_x, y) != EMPTY)
+		if ((grid[base_index + (dir * i)] & ACTIVE_MASK) != EMPTY)
 			break;
 		target_x = check_x;
 	}
@@ -197,7 +201,7 @@ static void try_spread_water(int x, int y) {
 		int check_x = x - (dir * i);
 		if (check_x < 0 || check_x >= screen_width)
 			break;
-		if (getCell(check_x, y) != EMPTY)
+		if ((grid[base_index - (dir * i)] & ACTIVE_MASK) != EMPTY)
 			break;
 		target_x = check_x;
 	}
@@ -212,7 +216,9 @@ void sim_water(int x, int y) {
 		return;
 	}
 
-	char below = getCell(x, y + 1);
+	int base_index = (y * screen_width) + x;
+	int below_index = base_index + screen_width;
+	char below = grid[below_index] & ACTIVE_MASK;
 
 	// 1. Fall straight down
 	if (can_displace(WATER, below)) {
@@ -225,7 +231,7 @@ void sim_water(int x, int y) {
 	int new_x = x + diag;
 
 	if (new_x >= 0 && new_x < screen_width) {
-		char diag_below = getCell(new_x, y + 1);
+		char diag_below = grid[below_index + diag] & ACTIVE_MASK;
 		if (can_displace(WATER, diag_below)) {
 			swap_cells(x, y, new_x, y + 1);
 			return;
@@ -234,7 +240,7 @@ void sim_water(int x, int y) {
 
 	new_x = x - diag;
 	if (new_x >= 0 && new_x < screen_width) {
-		char diag_below = getCell(new_x, y + 1);
+		char diag_below = grid[below_index - diag] & ACTIVE_MASK;
 		if (can_displace(WATER, diag_below)) {
 			swap_cells(x, y, new_x, y + 1);
 			return;
@@ -271,7 +277,6 @@ void simulate() {
 				unsigned char raw_cell = grid[row_offset + x];
 
 				if (raw_cell & ACTIVE_BIT) {
-
 					continue;
 				}
 
@@ -290,7 +295,7 @@ void simulate() {
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
 	int opt;
