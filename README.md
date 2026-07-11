@@ -91,9 +91,9 @@ src/
 
 ### Planned Improvements
 
-- Smart Simulating, simulate only active areas
+- Smart Simulating, simulate only active areas // implemented active cell bitmask but thats it
 - Better / faster water settling // done, kinda
 - More elements: Fire, Steam, Lava, Life
-- Dirty rendering
+- Dirty rendering // May not be worth it. Instead, opted for smarter line generation
 
 ### TODO:

@@ -84,6 +84,8 @@ typedef struct {
 	const char *name;
 	const char *color;
 	const char *bg_color;
+	size_t color_len;
+	size_t bg_color_len;
 	const int density;
 	ElementSimFn sim_fn;
 } Element;
