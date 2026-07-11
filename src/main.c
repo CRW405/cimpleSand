@@ -175,39 +175,34 @@ void sim_stone(int x, int y) {
 
 static void try_spread_water(int x, int y) {
 	int spread_amount = 10;
-	int spread_distance = 1 + (rand() % spread_amount);
 	int dir = (rand() % 2 == 0) ? 1 : -1;
-	int base_index = (y * screen_width) + x;
 
-	// Check primary chosen direction
-	int target_x = x;
-	for (int i = 1; i <= spread_distance; i++) {
-		int check_x = x + (dir * i);
-		if (check_x < 0 || check_x >= screen_width)
-			break;
-		if ((grid[base_index + (dir * i)] & ACTIVE_MASK) != EMPTY)
-			break;
-		target_x = check_x;
-	}
+	for (int d = 0; d < 2; d++) {
+		int current_dir = (d == 0) ? dir : -dir;
+		int target_x = x;
 
-	if (target_x != x) {
-		swap_cells(x, y, target_x, y);
-		return;
-	}
+		for (int i = 1; i <= spread_amount; i++) {
+			int check_x = x + (current_dir * i);
 
-	// Fallback to secondary direction
-	target_x = x;
-	for (int i = 1; i <= spread_distance; i++) {
-		int check_x = x - (dir * i);
-		if (check_x < 0 || check_x >= screen_width)
-			break;
-		if ((grid[base_index - (dir * i)] & ACTIVE_MASK) != EMPTY)
-			break;
-		target_x = check_x;
-	}
+			if (check_x < 0 || check_x >= screen_width)
+				break;
 
-	if (target_x != x) {
-		swap_cells(x, y, target_x, y);
+			if (getCell(check_x, y) != EMPTY)
+				break;
+
+			target_x = check_x;
+
+			char cell_below = getCell(check_x, y + 1);
+			if (can_displace(WATER, cell_below)) {
+				// swap_cells(x, y, check_x, y + 1);
+				break;
+			}
+		}
+
+		if (target_x != x) {
+			swap_cells(x, y, target_x, y);
+			return;
+		}
 	}
 }
 
@@ -220,13 +215,11 @@ void sim_water(int x, int y) {
 	int below_index = base_index + screen_width;
 	char below = grid[below_index] & ACTIVE_MASK;
 
-	// 1. Fall straight down
 	if (can_displace(WATER, below)) {
 		swap_cells(x, y, x, y + 1);
 		return;
 	}
 
-	// 2. Try falling diagonally down (left/right)
 	int diag = (rand() % 2 == 0) ? 1 : -1;
 	int new_x = x + diag;
 
@@ -247,26 +240,24 @@ void sim_water(int x, int y) {
 		}
 	}
 
-	char above = grid[base_index - screen_width];
-	char left = grid[base_index - 1] & ACTIVE_MASK;
-	char leftleft = grid[base_index - 2] & ACTIVE_MASK;
-	char right = grid[base_index + 1] & ACTIVE_MASK;
-	char rightright = grid[base_index + 2] & ACTIVE_MASK;
+	if (y > 0 && x >= 2 && x < screen_width - 2) {
+		char above = grid[base_index - screen_width] & ACTIVE_MASK;
+		char left = grid[base_index - 1] & ACTIVE_MASK;
+		char leftleft = grid[base_index - 2] & ACTIVE_MASK;
+		char right = grid[base_index + 1] & ACTIVE_MASK;
+		char rightright = grid[base_index + 2] & ACTIVE_MASK;
 
-	int evap_chance = 50; // 1 in 50 chance to evaporate
-	if (above != WATER &&
-	    left != WATER &&
-	    right != WATER &&
-	    leftleft != WATER &&
-	    rightright != WATER) {
-		if (rand() % evap_chance == 0) {
-			set_cell(x, y, EMPTY);
+		int evap_chance = 10;
+		if (above != WATER && left != WATER && right != WATER &&
+		    leftleft != WATER && rightright != WATER) {
+			if (rand() % evap_chance == 0) {
+				grid[base_index] = EMPTY;
+			}
 		}
 	}
 
 	try_spread_water(x, y);
 }
-
 void simulate() {
 	static unsigned frame = 0;
 	frame++;

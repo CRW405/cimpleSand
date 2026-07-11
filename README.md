@@ -92,7 +92,7 @@ src/
 ### Planned Improvements
 
 - Smart Simulating, simulate only active areas
-- Better / faster water settling
+- Better / faster water settling // done, kinda
 - More elements: Fire, Steam, Lava, Life
 - Dirty rendering
 
