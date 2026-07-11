@@ -22,16 +22,16 @@ void render() {
 	frame_buffer_offset += sizeof(CUR_TO_TOP) - 1;
 
 	for (int y = 0; y < screen_height; y += 2) {
-		int top_row_idx = y * screen_width;
-		int bot_row_idx = (y + 1) * screen_width;
+		int top_row_index = y * screen_width;
+		int bot_row_index = (y + 1) * screen_width;
 
 		for (int x = 0; x < screen_width; x++) {
-			unsigned char top_cell = grid[top_row_idx + x];
+			unsigned char top_cell = grid[top_row_index + x] & ACTIVE_MASK;
 			if (top_cell != EMPTY)
 				cell_count++;
 			const char *top_color = element_registry[top_cell].bg_color;
 
-			unsigned char bottom_cell = grid[bot_row_idx + x];
+			unsigned char bottom_cell = grid[bot_row_index + x] & ACTIVE_MASK;
 			if (bottom_cell != EMPTY)
 				cell_count++;
 			const char *bottom_color = element_registry[bottom_cell].color;
@@ -47,7 +47,6 @@ void render() {
 			memcpy(frame_buffer + frame_buffer_offset, bottom_color, len);
 			frame_buffer_offset += len;
 
-			// Copy the literal block "▄" (3 bytes in UTF-8: 0xE2, 0x96, 0x84)
 			memcpy(frame_buffer + frame_buffer_offset, "▄", 3);
 			frame_buffer_offset += 3;
 		}

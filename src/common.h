@@ -54,6 +54,9 @@
 #define GRAY "\e[38;5;240m"
 #define RESET_STYLE "\e[0m"
 
+#define ACTIVE_MASK 0b01111111
+#define ACTIVE_BIT ((unsigned char)~ACTIVE_MASK)
+
 typedef struct termios Termios;
 typedef struct timeval Timeval;
 typedef struct timespec Timespec;

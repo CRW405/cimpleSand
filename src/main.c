@@ -45,7 +45,7 @@ char getCell(int x, int y) {
 	if (x < 0 || x >= screen_width || y < 0 || y >= screen_height) {
 		return WALL;
 	}
-	return grid[(y * screen_width) + x];
+	return grid[(y * screen_width) + x] & ACTIVE_MASK;
 }
 
 void set_cell(int x, int y, char cell) {
@@ -115,9 +115,12 @@ static inline bool can_displace(char moving_cell, char target_cell) {
 }
 
 void swap_cells(int x1, int y1, int x2, int y2) {
-	char temp = getCell(x1, y1);
-	set_cell(x1, y1, getCell(x2, y2));
-	set_cell(x2, y2, temp);
+	int index1 = (y1 * screen_width) + x1;
+	int index2 = (y2 * screen_width) + x2;
+	unsigned char cell1 = grid[index1];
+	unsigned char cell2 = grid[index2];
+	grid[index1] = (cell2 & ACTIVE_MASK) | ACTIVE_BIT;
+	grid[index2] = (cell1 & ACTIVE_MASK) | ACTIVE_BIT;
 }
 
 void sim_sand(int x, int y) {
@@ -247,9 +250,17 @@ void simulate() {
 	frame++;
 
 	for (int y = screen_height - 1; y >= 0; y--) {
+		int row_offset = y * screen_width;
+
 		if (frame & 1) {
 			for (int x = 0; x < screen_width; x++) {
-				unsigned char cell = getCell(x, y);
+				unsigned char raw_cell = grid[row_offset + x];
+
+				if (raw_cell & ACTIVE_BIT) {
+					continue;
+				}
+
+				unsigned char cell = raw_cell & ACTIVE_MASK;
 				ElementSimFn sim_fn = element_registry[cell].sim_fn;
 				if (sim_fn) {
 					sim_fn(x, y);
@@ -257,13 +268,25 @@ void simulate() {
 			}
 		} else {
 			for (int x = screen_width - 1; x >= 0; x--) {
-				unsigned char cell = getCell(x, y);
+				unsigned char raw_cell = grid[row_offset + x];
+
+				if (raw_cell & ACTIVE_BIT) {
+
+					continue;
+				}
+
+				unsigned char cell = raw_cell & ACTIVE_MASK;
 				ElementSimFn sim_fn = element_registry[cell].sim_fn;
 				if (sim_fn) {
 					sim_fn(x, y);
 				}
 			}
 		}
+	}
+
+	int total_cells = screen_width * screen_height;
+	for (int i = 0; i < total_cells; i++) {
+		grid[i] &= ACTIVE_MASK;
 	}
 }
 
