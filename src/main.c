@@ -247,7 +247,23 @@ void sim_water(int x, int y) {
 		}
 	}
 
-	// 3. Spreading step if downward tracks are fully locked out
+	char above = grid[base_index - screen_width];
+	char left = grid[base_index - 1] & ACTIVE_MASK;
+	char leftleft = grid[base_index - 2] & ACTIVE_MASK;
+	char right = grid[base_index + 1] & ACTIVE_MASK;
+	char rightright = grid[base_index + 2] & ACTIVE_MASK;
+
+	int evap_chance = 50; // 1 in 50 chance to evaporate
+	if (above != WATER &&
+	    left != WATER &&
+	    right != WATER &&
+	    leftleft != WATER &&
+	    rightright != WATER) {
+		if (rand() % evap_chance == 0) {
+			set_cell(x, y, EMPTY);
+		}
+	}
+
 	try_spread_water(x, y);
 }
 
