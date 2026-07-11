@@ -97,6 +97,3 @@ src/
 - Dirty rendering
 
 ### TODO:
-
-- Optimize the render hot path (`render.c`) by reducing per-cell formatting/output overhead.
-- Optimize simulation inner loops (`simulate` / `sim_*`) to cut repeated cell access and bounds-check cost.
