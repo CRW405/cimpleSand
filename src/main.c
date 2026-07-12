@@ -204,7 +204,7 @@ static void try_spread_water(int x, int y) {
 
 			char cell_below = getCell(check_x, y + 1);
 			if (can_displace(WATER, cell_below)) {
-				// swap_cells(x, y, check_x, y + 1);
+				swap_cells(x, y, check_x, y + 1);
 				break;
 			}
 		}
@@ -268,6 +268,7 @@ void sim_water(int x, int y) {
 
 	try_spread_water(x, y);
 }
+
 void simulate() {
 	static unsigned frame = 0;
 	frame++;

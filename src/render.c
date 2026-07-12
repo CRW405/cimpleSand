@@ -21,6 +21,9 @@ void render() {
 	memcpy(frame_buffer + frame_buffer_offset, CUR_TO_TOP, sizeof(CUR_TO_TOP) - 1);
 	frame_buffer_offset += sizeof(CUR_TO_TOP) - 1;
 
+	memcpy(frame_buffer + frame_buffer_offset, RESET_STYLE, sizeof(RESET_STYLE) - 1);
+	frame_buffer_offset += sizeof(RESET_STYLE) - 1;
+
 	// Track active colors across the row to strip out redundant ANSI strings
 	const char *last_top_color = NULL;
 	const char *last_bottom_color = NULL;

@@ -13,7 +13,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define TARGET_FPS 120
+#define TARGET_FPS 240
 
 #define EMPTY 0
 #define WALL 1
