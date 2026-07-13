@@ -148,6 +148,12 @@ src/
   common.h     # shared constants, globals, types, escape codes
 ```
 
+## Problems
+- Screen stripey / glitchy / broken.
+    - Try zooming out your terminal.
+- Water in a column is slowly evaporating away when it shouldnt.
+    - Im aware of this and am looking into it.
+
 ## Notes / planned work
 
 - Continue improving active-region simulation (current active-bit swap guard is in place)

@@ -41,6 +41,20 @@ void init_grid(int width, int height) {
 	}
 }
 
+// quicker psuedo rng coin flip
+static inline bool fast_coin_flip() {
+	static unsigned long x = 123456789, y = 362436069, z = 521288629;
+	unsigned long t;
+	x ^= x << 16;
+	x ^= x >> 5;
+	x ^= x << 1;
+	t = x;
+	x = y;
+	y = z;
+	z = t ^ x ^ y;
+	return (z & 1);
+}
+
 char getCell(int x, int y) {
 	if (x < 0 || x >= screen_width || y < 0 || y >= screen_height) {
 		return WALL;
@@ -73,9 +87,6 @@ void paint(int x_center, int y_center, int radius, char cell) {
 		}
 	}
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// sim
 
 void sim_sand(int x, int y);
 void sim_water(int x, int y);
