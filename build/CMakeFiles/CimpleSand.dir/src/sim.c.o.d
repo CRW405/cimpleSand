@@ -1,5 +1,6 @@
-CMakeFiles/CimpleSand.dir/src/main.c.o: \
- /home/think/Documents/cimpleSand/src/main.c /usr/include/stdc-predef.h \
+CMakeFiles/CimpleSand.dir/src/sim.c.o: \
+ /home/think/Documents/cimpleSand/src/sim.c /usr/include/stdc-predef.h \
+ /home/think/Documents/cimpleSand/src/sim.h \
  /home/think/Documents/cimpleSand/src/common.h /usr/include/signal.h \
  /usr/include/features.h /usr/include/features-time64.h \
  /usr/include/bits/wordsize.h /usr/include/bits/timesize.h \
@@ -63,8 +64,4 @@ CMakeFiles/CimpleSand.dir/src/main.c.o: \
  /usr/include/bits/types/struct_itimerspec.h /usr/include/unistd.h \
  /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
  /usr/include/bits/confname.h /usr/include/bits/getopt_posix.h \
- /usr/include/bits/getopt_core.h /usr/include/bits/unistd_ext.h \
- /home/think/Documents/cimpleSand/src/input.h \
- /home/think/Documents/cimpleSand/src/render.h \
- /home/think/Documents/cimpleSand/src/sim.h \
- /home/think/Documents/cimpleSand/src/term_ops.h
+ /usr/include/bits/getopt_core.h /usr/include/bits/unistd_ext.h

@@ -1,4 +1,5 @@
 #include "input.h"
+#include "sim.h"
 
 static bool left_mouse_held = false;
 static bool right_mouse_held = false;
@@ -101,7 +102,7 @@ static const MouseStateBinding mouse_state_registry[] = {
 };
 
 static bool apply_element_binding(char key) {
-	if (key < '1' || key > ('0' + STONE)) {
+	if (key < '1' || key > ('0' + ELEMENT_COUNT - 1)) {
 		return false;
 	}
 	current_cell = key - '0';

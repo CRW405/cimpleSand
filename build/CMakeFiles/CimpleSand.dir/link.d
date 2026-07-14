@@ -6,6 +6,7 @@ CimpleSand: \
   CMakeFiles/CimpleSand.dir/src/term_ops.c.o \
   CMakeFiles/CimpleSand.dir/src/input.c.o \
   CMakeFiles/CimpleSand.dir/src/render.c.o \
+  CMakeFiles/CimpleSand.dir/src/sim.c.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s_asneeded.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s_asneeded.so \
@@ -51,6 +52,8 @@ CMakeFiles/CimpleSand.dir/src/term_ops.c.o:
 CMakeFiles/CimpleSand.dir/src/input.c.o:
 
 CMakeFiles/CimpleSand.dir/src/render.c.o:
+
+CMakeFiles/CimpleSand.dir/src/sim.c.o:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a:
 

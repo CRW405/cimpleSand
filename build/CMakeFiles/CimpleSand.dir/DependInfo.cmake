@@ -11,6 +11,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/think/Documents/cimpleSand/src/input.c" "CMakeFiles/CimpleSand.dir/src/input.c.o" "gcc" "CMakeFiles/CimpleSand.dir/src/input.c.o.d"
   "/home/think/Documents/cimpleSand/src/main.c" "CMakeFiles/CimpleSand.dir/src/main.c.o" "gcc" "CMakeFiles/CimpleSand.dir/src/main.c.o.d"
   "/home/think/Documents/cimpleSand/src/render.c" "CMakeFiles/CimpleSand.dir/src/render.c.o" "gcc" "CMakeFiles/CimpleSand.dir/src/render.c.o.d"
+  "/home/think/Documents/cimpleSand/src/sim.c" "CMakeFiles/CimpleSand.dir/src/sim.c.o" "gcc" "CMakeFiles/CimpleSand.dir/src/sim.c.o.d"
   "/home/think/Documents/cimpleSand/src/term_ops.c" "CMakeFiles/CimpleSand.dir/src/term_ops.c.o" "gcc" "CMakeFiles/CimpleSand.dir/src/term_ops.c.o.d"
   "" "CimpleSand" "gcc" "CMakeFiles/CimpleSand.dir/link.d"
   )

@@ -201,6 +201,30 @@ src/render.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/CimpleSand.dir/build.make CMakeFiles/CimpleSand.dir/src/render.c.s
 .PHONY : src/render.c.s
 
+src/sim.o: src/sim.c.o
+.PHONY : src/sim.o
+
+# target to build an object file
+src/sim.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CimpleSand.dir/build.make CMakeFiles/CimpleSand.dir/src/sim.c.o
+.PHONY : src/sim.c.o
+
+src/sim.i: src/sim.c.i
+.PHONY : src/sim.i
+
+# target to preprocess a source file
+src/sim.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CimpleSand.dir/build.make CMakeFiles/CimpleSand.dir/src/sim.c.i
+.PHONY : src/sim.c.i
+
+src/sim.s: src/sim.c.s
+.PHONY : src/sim.s
+
+# target to generate assembly for a file
+src/sim.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/CimpleSand.dir/build.make CMakeFiles/CimpleSand.dir/src/sim.c.s
+.PHONY : src/sim.c.s
+
 src/term_ops.o: src/term_ops.c.o
 .PHONY : src/term_ops.o
 
@@ -243,6 +267,9 @@ help:
 	@echo "... src/render.o"
 	@echo "... src/render.i"
 	@echo "... src/render.s"
+	@echo "... src/sim.o"
+	@echo "... src/sim.i"
+	@echo "... src/sim.s"
 	@echo "... src/term_ops.o"
 	@echo "... src/term_ops.i"
 	@echo "... src/term_ops.s"

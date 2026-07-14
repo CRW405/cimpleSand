@@ -9,5 +9,6 @@ add_executable(CimpleSand
     src/term_ops.c
     src/input.c
     src/render.c
+    src/sim.c
 )
 

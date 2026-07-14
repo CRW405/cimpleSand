@@ -6,6 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/CimpleSand.dir/src/main.c.o.d"
   "CMakeFiles/CimpleSand.dir/src/render.c.o"
   "CMakeFiles/CimpleSand.dir/src/render.c.o.d"
+  "CMakeFiles/CimpleSand.dir/src/sim.c.o"
+  "CMakeFiles/CimpleSand.dir/src/sim.c.o.d"
   "CMakeFiles/CimpleSand.dir/src/term_ops.c.o"
   "CMakeFiles/CimpleSand.dir/src/term_ops.c.o.d"
   "CimpleSand"
