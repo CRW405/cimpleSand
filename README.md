@@ -160,6 +160,5 @@ src/
 
 ## Notes / planned work
 
-- Continue improving active-region simulation (current active-bit swap guard is in place)
 - Add more elements (fire, steam, lava, life)
-- Keep tuning fluid settling and overall update stability
+- Keep tuning fluid settling and evaporation behavior

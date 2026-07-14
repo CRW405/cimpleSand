@@ -10,10 +10,13 @@
 
 /** @brief Left bound of dirty/active area touched in the current frame. */
 extern int min_active_x;
+
 /** @brief Right bound of dirty/active area touched in the current frame. */
 extern int max_active_x;
+
 /** @brief Top bound of dirty/active area touched in the current frame. */
 extern int min_active_y;
+
 /** @brief Bottom bound of dirty/active area touched in the current frame. */
 extern int max_active_y;
 
