@@ -45,7 +45,7 @@ Optional FPS target:
 ./build/CimpleSand -f 120
 ```
 
-- `-f 0` resets to default (`120`)
+- `-f 0` resets to default (`240`)
 - Negative values effectively run uncapped (no sleep throttle)
 
 ## Controls
@@ -97,9 +97,11 @@ Core simulation behavior:
 
 - processed bottom-up (`y = height - 1` to `0`) so gravity looks stable
 - horizontal scan direction alternates every frame to reduce directional bias
-- movement is density-based (`can_displace(moving, target)`)
+- movement is density-based using precomputed `cell_densities[]`
+- simulation work is restricted to an active region (`min/max_active_*`) with a
+  one-cell margin, instead of scanning the full grid every frame
 - swaps set active bits on both cells to prevent same-frame double updates
-- active bits are cleared after the frame pass
+- active bits are cleared after the region pass
 
 Current element rules:
 
@@ -141,7 +143,9 @@ Mouse coordinates are mapped from terminal rows to sim rows (`sim_y = (mouse_y -
 
 ```text
 src/
-  main.c       # entrypoint, grid init, main loop, element sim rules
+  main.c       # entrypoint, grid init, terminal lifecycle, frame timing
+  sim.c        # element registry, simulation rules, active-region stepping
+  sim.h        # simulation API and state bounds
   render.c     # frame assembly, ANSI optimization, HUD output
   input.c      # non-blocking key handling + SGR mouse parsing/painting
   term_ops.c   # terminal mode setup/teardown and escape helpers
