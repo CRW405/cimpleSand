@@ -26,8 +26,11 @@
 #define WATER 3
 #define STONE 4
 #define OIL 5
+#define FIRE 6
+#define STEAM 7
+#define LAVA 8
 
-#define ELEMENT_COUNT (OIL + 1)
+#define ELEMENT_COUNT (LAVA + 1)
 
 #define CLEAR "\e[2J"
 #define CUR_TO_TOP "\e[H"
@@ -143,7 +146,7 @@ typedef struct {
 	const char *bg_color; /**< ANSI background color sequence for rendering. */
 	size_t color_len;     /**< Cached byte length of @ref color. */
 	size_t bg_color_len;  /**< Cached byte length of @ref bg_color. */
-	const int density;    /**< Relative density used by movement rules. */
+	const char density;   /**< Relative density used by movement rules. */
 	ElementSimFn sim_fn;  /**< Per-cell behavior callback, or NULL if static. */
 } Element;
 

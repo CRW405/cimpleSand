@@ -8,11 +8,13 @@ int max_active_y = 0;
 
 int cell_densities[ELEMENT_COUNT];
 
-// Simulation function prototypes
 void sim_sand(int x, int y);
 void sim_water(int x, int y);
 void sim_stone(int x, int y);
 void sim_oil(int x, int y);
+void sim_fire(int x, int y);
+void sim_steam(int x, int y);
+void sim_lava(int x, int y);
 
 const Element element_registry[] = {
 	[EMPTY] = { .name = "Empty",
@@ -28,7 +30,7 @@ const Element element_registry[] = {
 	           .bg_color = BG_WHITE,
 	           .color_len = sizeof(WHITE) - 1,
 	           .bg_color_len = sizeof(BG_WHITE) - 1,
-	           .density = 1000000,
+	           .density = 127,
 	           .sim_fn = NULL      },
 
 	[SAND] = { .name = "Sand",
@@ -44,7 +46,7 @@ const Element element_registry[] = {
                .bg_color = BG_GRAY,
                .color_len = sizeof(GRAY) - 1,
                .bg_color_len = sizeof(BG_GRAY) - 1,
-               .density = 150,
+               .density = 100,
                .sim_fn = sim_stone },
 
 	[WATER] = { .name = "Water",
@@ -52,7 +54,7 @@ const Element element_registry[] = {
                .bg_color = BG_BLUE,
                .color_len = sizeof(BLUE) - 1,
                .bg_color_len = sizeof(BG_BLUE) - 1,
-               .density = 10,
+               .density = 30,
                .sim_fn = sim_water },
 
 	[OIL] = { .name = "Oil",
@@ -60,9 +62,39 @@ const Element element_registry[] = {
 	           .bg_color = BG_PURPLE,
 	           .color_len = sizeof(PURPLE) - 1,
 	           .bg_color_len = sizeof(BG_PURPLE) - 1,
-	           .density = 5,
-	           .sim_fn = sim_oil   }
+	           .density = 20,
+	           .sim_fn = sim_oil   },
+
+	[FIRE] = { .name = "Fire",
+	           .color = RED,
+	           .bg_color = BG_RED,
+	           .color_len = sizeof(RED) - 1,
+	           .bg_color_len = sizeof(BG_RED) - 1,
+	           .density = 1,
+	           .sim_fn = sim_fire  },
+
+	[STEAM] = { .name = "Steam",
+               .color = WHITE,
+               .bg_color = BG_WHITE,
+               .color_len = sizeof(WHITE) - 1,
+               .bg_color_len = sizeof(BG_WHITE) - 1,
+               .density = 2,
+               .sim_fn = sim_steam },
+
+	[LAVA] = { .name = "Lava",
+	           .color = RED,
+	           .bg_color = BG_RED,
+	           .color_len = sizeof(RED) - 1,
+	           .bg_color_len = sizeof(BG_RED) - 1,
+	           .density = 80,
+	           .sim_fn = sim_lava  }
 };
+
+void init_cell_densities(void) {
+	for (int i = 0; i < ELEMENT_COUNT; i++) {
+		cell_densities[i] = element_registry[i].density;
+	}
+}
 
 static inline void mark_active(int x, int y) {
 	if (x < min_active_x)
@@ -95,7 +127,8 @@ void set_cell(int x, int y, char cell) {
 		cell_count++;
 
 	grid[index] = cell;
-	mark_active(x, y);
+	mark_active(x - 1, y - 1);
+	mark_active(x + 1, y + 1);
 }
 
 static inline void swap_cells(int x1, int y1, int x2, int y2) {
@@ -106,8 +139,10 @@ static inline void swap_cells(int x1, int y1, int x2, int y2) {
 	grid[index1] = (cell2 & ACTIVE_MASK) | ACTIVE_BIT;
 	grid[index2] = (cell1 & ACTIVE_MASK) | ACTIVE_BIT;
 
-	mark_active(x1, y1);
-	mark_active(x2, y2);
+	mark_active(x1 - 1, y1 - 1);
+	mark_active(x1 + 1, y1 + 1);
+	mark_active(x2 - 1, y2 - 1);
+	mark_active(x2 + 1, y2 + 1);
 }
 
 void paint(int x_center, int y_center, int radius, char cell) {
@@ -136,7 +171,7 @@ static inline bool try_fall_down(int x, int y, char element_id) {
 	int base_index = (y * screen_width) + x;
 	int below_index = base_index + screen_width;
 	char below = grid[below_index] & ACTIVE_MASK;
-	unsigned char current_density = cell_densities[(unsigned char)element_id];
+	char current_density = cell_densities[(unsigned char)element_id];
 
 	if (current_density > cell_densities[(unsigned char)below]) {
 		swap_cells(x, y, x, y + 1);
@@ -151,7 +186,7 @@ bool try_fall_diagonal(int x, int y, char element_id) {
 
 	int base_index = (y * screen_width) + x;
 	int below_index = base_index + screen_width;
-	unsigned char current_density = cell_densities[(unsigned char)element_id];
+	char current_density = cell_densities[(unsigned char)element_id];
 
 	int diag = (rand() % 2 == 0) ? 1 : -1;
 	int new_x = x + diag;
@@ -176,10 +211,9 @@ bool try_fall_diagonal(int x, int y, char element_id) {
 	return false;
 }
 
-// Flows horizontally, swapping into any element that is less dense
 bool try_liquid_flow(int x, int y, char element_id, int flow_limit) {
 	int dir = (rand() % 2 == 0) ? 1 : -1;
-	unsigned char current_density = cell_densities[(unsigned char)element_id];
+	char current_density = cell_densities[(unsigned char)element_id];
 
 	for (int d = 0; d < 2; d++) {
 		int current_dir = (d == 0) ? dir : -dir;
@@ -196,7 +230,6 @@ bool try_liquid_flow(int x, int y, char element_id, int flow_limit) {
 
 			target_x = check_x;
 
-			// Check if we can slip downward mid-flow (breaks surface tension)
 			char cell_below = get_cell(check_x, y + 1);
 			if (current_density > cell_densities[(unsigned char)cell_below]) {
 				swap_cells(x, y, check_x, y + 1);
@@ -214,22 +247,139 @@ bool try_liquid_flow(int x, int y, char element_id, int flow_limit) {
 }
 
 bool try_liquid_evaporation(int x, int y, char element_id, int chance) {
-	if (y <= 0 || x < 2 || x >= screen_width - 2) {
-		return false;
-	}
+	char above = get_cell(x, y - 1);
+	char left = get_cell(x - 1, y);
+	char leftleft = get_cell(x - 2, y);
+	char right = get_cell(x + 1, y);
+	char rightright = get_cell(x + 2, y);
 
-	int base_index = (y * screen_width) + x;
-	char above = grid[base_index - screen_width] & ACTIVE_MASK;
-	char left = grid[base_index - 1] & ACTIVE_MASK;
-	char leftleft = grid[base_index - 2] & ACTIVE_MASK;
-	char right = grid[base_index + 1] & ACTIVE_MASK;
-	char rightright = grid[base_index + 2] & ACTIVE_MASK;
-
-	// Only evaporate if isolated (surrounded by air, not sitting in a puddle of itself)
 	if (above != element_id && left != element_id && right != element_id &&
 	    leftleft != element_id && rightright != element_id) {
 		if (rand() % chance == 0) {
 			set_cell(x, y, EMPTY);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static inline bool try_rise_up(int x, int y, char element_id) {
+	if (y - 1 < 0) {
+		return false;
+	}
+
+	int base_index = (y * screen_width) + x;
+	int above_index = base_index - screen_width;
+	char above = grid[above_index] & ACTIVE_MASK;
+	char current_density = cell_densities[(unsigned char)element_id];
+
+	// Restored: Gas (positive density) is heavier than empty air (0), so it rises if current > above
+	if (current_density > cell_densities[(unsigned char)above] && above != WALL) {
+		swap_cells(x, y, x, y - 1);
+		return true;
+	}
+	return false;
+}
+
+static inline bool try_rise_diagonal(int x, int y, char element_id) {
+	if (y - 1 < 0)
+		return false;
+
+	int base_index = (y * screen_width) + x;
+	int above_index = base_index - screen_width;
+	char current_density = cell_densities[(unsigned char)element_id];
+
+	int diag = (rand() % 2 == 0) ? 1 : -1;
+	int new_x = x + diag;
+
+	if (new_x >= 0 && new_x < screen_width) {
+		char diag_above = grid[above_index + diag] & ACTIVE_MASK;
+		if (current_density > cell_densities[(unsigned char)diag_above] && diag_above != WALL) {
+			swap_cells(x, y, new_x, y - 1);
+			return true;
+		}
+	}
+
+	new_x = x - diag;
+	if (new_x >= 0 && new_x < screen_width) {
+		char diag_above = grid[above_index - diag] & ACTIVE_MASK;
+		if (current_density > cell_densities[(unsigned char)diag_above] && diag_above != WALL) {
+			swap_cells(x, y, new_x, y - 1);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static inline bool try_gas_drift(int x, int y, char element_id, int drift_limit) {
+	int dir = (rand() % 2 == 0) ? 1 : -1;
+	char current_density = cell_densities[(unsigned char)element_id];
+
+	for (int d = 0; d < 2; d++) {
+		int current_dir = (d == 0) ? dir : -dir;
+		int target_x = x;
+
+		for (int i = 1; i <= drift_limit; i++) {
+			int check_x = x + (current_dir * i);
+			if (check_x < 0 || check_x >= screen_width)
+				break;
+
+			char side_cell = get_cell(check_x, y);
+			// Restored: Gas drifts sideways into less dense spaces (like empty air)
+			if (current_density < cell_densities[(unsigned char)side_cell] || side_cell == WALL)
+				break;
+
+			target_x = check_x;
+
+			char cell_above = get_cell(check_x, y - 1);
+			if (current_density > cell_densities[(unsigned char)cell_above] && cell_above != WALL) {
+				swap_cells(x, y, check_x, y - 1);
+				return true;
+			}
+		}
+
+		if (target_x != x) {
+			swap_cells(x, y, target_x, y);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// Allows steam/gas to flow outward horizontally under ceilings, matching your positive density setup
+bool try_gas_flow(int x, int y, char element_id, int flow_limit) {
+	int dir = (rand() % 2 == 0) ? 1 : -1;
+	char current_density = cell_densities[(unsigned char)element_id];
+
+	for (int d = 0; d < 2; d++) {
+		int current_dir = (d == 0) ? dir : -dir;
+		int target_x = x;
+
+		for (int i = 1; i <= flow_limit; i++) {
+			int check_x = x + (current_dir * i);
+			if (check_x < 0 || check_x >= screen_width)
+				break;
+
+			char side_cell = get_cell(check_x, y);
+			// Stop flowing if we hit something denser than us (like water, stone, or a wall)
+			if (current_density < cell_densities[(unsigned char)side_cell] || side_cell == WALL)
+				break;
+
+			target_x = check_x;
+
+			// Slip upward mid-drift if there is a less dense cell above
+			char cell_above = get_cell(check_x, y - 1);
+			if (current_density > cell_densities[(unsigned char)cell_above] && cell_above != WALL) {
+				swap_cells(x, y, check_x, y - 1);
+				return true;
+			}
+		}
+
+		if (target_x != x) {
+			swap_cells(x, y, target_x, y);
 			return true;
 		}
 	}
@@ -267,6 +417,81 @@ void sim_oil(int x, int y) {
 	try_liquid_flow(x, y, OIL, 1);
 }
 
+void sim_fire(int x, int y) {
+	int dx[] = { 0, 0, -1, 1 };
+	int dy[] = { -1, 1, 0, 0 };
+
+	for (int i = 0; i < 4; i++) {
+		int nx = x + dx[i];
+		int ny = y + dy[i];
+		char neighbor = get_cell(nx, ny);
+
+		switch (neighbor) {
+		case WATER:
+			set_cell(nx, ny, STEAM);
+			set_cell(x, y, EMPTY);
+			return;
+		case OIL:
+			set_cell(nx, ny, FIRE);
+			return;
+		}
+	}
+	if (rand() % 10 == 0) {
+		set_cell(x, y, EMPTY);
+		return;
+	}
+
+	if (try_rise_up(x, y, FIRE))
+		return;
+	if (try_rise_diagonal(x, y, FIRE))
+		return;
+
+	try_gas_drift(x, y, FIRE, 1);
+}
+
+void sim_steam(int x, int y) {
+	if (try_rise_up(x, y, STEAM))
+		return;
+	if (try_rise_diagonal(x, y, STEAM))
+		return;
+	int roll = rand() % 1000;
+	if (roll < 2) {
+		set_cell(x, y, WATER);
+	} else if (roll < 10) {
+		set_cell(x, y, EMPTY);
+	}
+	if (try_gas_flow(x, y, STEAM, 5))
+		return;
+}
+
+void sim_lava(int x, int y) {
+	if (try_fall_down(x, y, LAVA))
+		return;
+	if (try_fall_diagonal(x, y, LAVA))
+		return;
+
+	int dx[] = { 0, 0, -1, 1 };
+	int dy[] = { -1, 1, 0, 0 };
+
+	for (int i = 0; i < 4; i++) {
+		int nx = x + dx[i];
+		int ny = y + dy[i];
+		char neighbor = get_cell(nx, ny);
+
+		switch (neighbor) {
+		case WATER:
+			set_cell(nx, ny, STEAM);
+			set_cell(x, y, STONE);
+			return;
+		case OIL:
+			set_cell(nx, ny, FIRE);
+			return;
+		}
+	}
+
+	try_liquid_flow(x, y, LAVA, 1);
+}
+
 void simulate() {
 	if (min_active_x > max_active_x || min_active_y > max_active_y) {
 		return;
@@ -275,10 +500,10 @@ void simulate() {
 	static unsigned frame = 0;
 	frame++;
 
-	int start_y = (max_active_y + 1 < screen_height) ? max_active_y + 1 : screen_height - 1;
-	int end_y = (min_active_y - 1 >= 0) ? min_active_y - 1 : 0;
-	int start_x = (min_active_x - 1 >= 0) ? min_active_x - 1 : 0;
-	int end_x = (max_active_x + 1 < screen_width) ? max_active_x + 1 : screen_width - 1;
+	int start_y = (max_active_y + 2 < screen_height) ? max_active_y + 2 : screen_height - 1;
+	int end_y = (min_active_y - 2 >= 0) ? min_active_y - 2 : 0;
+	int start_x = (min_active_x - 2 >= 0) ? min_active_x - 2 : 0;
+	int end_x = (max_active_x + 2 < screen_width) ? max_active_x + 2 : screen_width - 1;
 
 	min_active_x = screen_width;
 	max_active_x = 0;

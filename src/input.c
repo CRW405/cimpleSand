@@ -159,7 +159,24 @@ static void handle_mouse_event(const char *seq, int seq_len) {
 	if (sscanf(seq + MOUSE_SEQUENCE_OFFSET, "%d;%d;%d",
 	           &parsed_button, &parsed_x, &parsed_y) == 3) {
 		set_mouse_position(parsed_x, parsed_y);
-		update_mouse_button_state(event_type, parsed_button);
+
+		// Handle Scroll Up (64) and Scroll Down (65)
+		if (parsed_button == 64) {
+			int next = current_cell + 1;
+			if (next >= ELEMENT_COUNT) {
+				next = 1; // Loop back to the first non-empty element
+			}
+			current_cell = next;
+		} else if (parsed_button == 65) {
+			int next = current_cell - 1;
+			if (next < 1) {
+				next = ELEMENT_COUNT - 1; // Wrap around to the last element
+			}
+			current_cell = next;
+		} else {
+			// Only update click tracking if it's not a scroll event
+			update_mouse_button_state(event_type, parsed_button);
+		}
 	}
 
 	last_input = event_type;
