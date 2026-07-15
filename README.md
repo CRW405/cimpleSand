@@ -8,6 +8,8 @@ This is a fun project for me to get better with C by building an idea I have wan
 
 The main highlight is the technical side: custom terminal rendering, raw input handling (including SGR mouse), and a density-based cellular sim loop tuned to run at high FPS in a normal terminal.
 
+Now has turned into a side project and "proper" C and optimization practice.
+
 ## Build and run
 
 ### Requirements
@@ -57,6 +59,7 @@ Optional FPS target:
 | `2` | Select Sand |
 | `3` | Select Water |
 | `4` | Select Stone |
+| `5` | Select Oil |
 | `-` / `_` | Decrease brush size |
 | `+` / `=` | Increase brush size |
 | Left click / drag | Paint selected material |
@@ -161,4 +164,3 @@ src/
 ## Notes / planned work
 
 - Add more elements (fire, steam, lava, life)
-- Keep tuning fluid settling and evaporation behavior
