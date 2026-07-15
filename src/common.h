@@ -25,8 +25,9 @@
 #define SAND 2
 #define WATER 3
 #define STONE 4
+#define OIL 5
 
-#define ELEMENT_COUNT (STONE + 1)
+#define ELEMENT_COUNT (OIL + 1)
 
 #define CLEAR "\e[2J"
 #define CUR_TO_TOP "\e[H"
@@ -50,6 +51,8 @@
 #define BG_CYAN "\e[46m"
 #define BG_WHITE "\e[47m"
 #define BG_GRAY "\e[48;5;240m"
+#define BG_PURPLE "\e[48;5;129m"
+
 #define BLACK "\e[30m"
 #define RED "\e[31m"
 #define GREEN "\e[32m"
@@ -59,6 +62,8 @@
 #define CYAN "\e[36m"
 #define WHITE "\e[37m"
 #define GRAY "\e[38;5;240m"
+#define PURPLE "\e[38;5;129m"
+
 #define RESET_STYLE "\e[0m"
 
 #define ACTIVE_MASK 0b01111111
