@@ -164,3 +164,6 @@ src/
 ## Notes / planned work
 
 - Add more elements (fire, steam, lava, life)
+- Tweak liquids, find a better way to handle surface settling
+- *Future* Velocity
+- *Future* Graphical rendering
