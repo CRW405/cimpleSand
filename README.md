@@ -63,6 +63,8 @@ Optional FPS target:
 | `6` | Select Fire |
 | `7` | Select Steam |
 | `8` | Select Lava |
+| `9` | Select Wood |
+| `0` | Select Ash |
 | `-` / `_` | Decrease brush size |
 | `+` / `=` | Increase brush size |
 | Left click / drag | Paint selected material |
@@ -122,6 +124,9 @@ Current element rules:
 - **Fire**: acts as a gas; rises upward and diagonally, drifts sideways, ignites nearby Oil, and turns Water into Steam. Extinguishes randomly over time.
 - **Steam**: gas that rises and drifts laterally (up to 5 cells); can condense back into Water or dissipate randomly
 - **Lava**: dense liquid; falls and flows slowly (up to 1 cell), turns Water into Steam (solidifying itself into Stone), and ignites nearby Oil
+- **Wood**: static solid; instantly ignites (becomes **Wood (Burning)**) when adjacent to Fire or Lava
+- **Wood (Burning)**: orange ember stage; occasionally spawns a Fire cell above (visual flame), then after ~2 seconds collapses into **Ash**
+- **Ash**: dense falling solid (density 110); falls straight down and diagonally — heavier than Sand so nothing sinks through it
 
 Gas/rise mechanics (used by Fire and Steam):
 - `try_rise_up` / `try_rise_diagonal`: move upward when the cell above is less dense (including empty air)
@@ -183,8 +188,6 @@ src/
 
 - Add more elements:
     - Gunpowder
-    - Wood
-    - Ash
     - Acid
     - Lightning / electricity
     - Life

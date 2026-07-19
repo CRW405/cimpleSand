@@ -15,6 +15,9 @@ void sim_oil(int x, int y);
 void sim_fire(int x, int y);
 void sim_steam(int x, int y);
 void sim_lava(int x, int y);
+void sim_wood(int x, int y);
+void sim_ash(int x, int y);
+void sim_wood_burning(int x, int y);
 
 const Element element_registry[] = {
 	[EMPTY] = { .name = "Empty",
@@ -87,7 +90,31 @@ const Element element_registry[] = {
 	           .color_len = sizeof(RED) - 1,
 	           .bg_color_len = sizeof(BG_RED) - 1,
 	           .density = 80,
-	           .sim_fn = sim_lava  }
+	           .sim_fn = sim_lava  },
+
+	[WOOD] = { .name = "Wood",
+	           .color = BROWN,
+	           .bg_color = BG_BROWN,
+	           .color_len = sizeof(BROWN) - 1,
+	           .bg_color_len = sizeof(BG_BROWN) - 1,
+	           .density = 90,
+	           .sim_fn = sim_wood },
+
+	[ASH] = { .name = "Ash",
+	          .color = LGRAY,
+	          .bg_color = BG_LGRAY,
+	          .color_len = sizeof(LGRAY) - 1,
+	          .bg_color_len = sizeof(BG_LGRAY) - 1,
+	          .density = 110,
+	          .sim_fn = sim_ash   },
+
+	[WOOD_BURNING] = { .name = "Wood (Burning)",
+	                   .color = ORANGE,
+	                   .bg_color = BG_ORANGE,
+	                   .color_len = sizeof(ORANGE) - 1,
+	                   .bg_color_len = sizeof(BG_ORANGE) - 1,
+	                   .density = 90,
+	                   .sim_fn = sim_wood_burning }
 };
 
 void init_cell_densities(void) {
@@ -441,6 +468,9 @@ void sim_fire(int x, int y) {
 		case OIL:
 			set_cell(nx, ny, FIRE);
 			return;
+		case WOOD:
+			set_cell(nx, ny, WOOD_BURNING);
+			break;
 		}
 	}
 	if (rand() % 10 == 0) {
@@ -493,10 +523,45 @@ void sim_lava(int x, int y) {
 		case OIL:
 			set_cell(nx, ny, FIRE);
 			return;
+		case WOOD:
+			set_cell(nx, ny, WOOD_BURNING);
+			break;
 		}
 	}
 
 	try_liquid_flow(x, y, LAVA, 1);
+}
+
+void sim_wood(int x, int y) {
+	int dx[] = { 0, 0, -1, 1, -1, -1, 1, 1 };
+	int dy[] = { -1, 1, 0, 0, -1, 1, -1, 1 };
+
+	for (int i = 0; i < 8; i++) {
+		char neighbor = get_cell(x + dx[i], y + dy[i]);
+		if (neighbor == FIRE || neighbor == LAVA) {
+			set_cell(x, y, WOOD_BURNING);
+			return;
+		}
+	}
+}
+
+void sim_wood_burning(int x, int y) {
+	if (rand() % 15 == 0) {
+		if (y - 1 >= 0 && get_cell(x, y - 1) == EMPTY)
+			set_cell(x, y - 1, FIRE);
+	}
+	if (rand() % 120 == 0) {
+		set_cell(x, y, ASH);
+		if (y - 1 >= 0 && get_cell(x, y - 1) == EMPTY)
+			set_cell(x, y - 1, FIRE);
+		return;
+	}
+}
+
+void sim_ash(int x, int y) {
+	if (try_fall_down(x, y, ASH))
+		return;
+	try_fall_diagonal(x, y, ASH);
 }
 
 void simulate() {

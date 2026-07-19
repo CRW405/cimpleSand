@@ -29,8 +29,11 @@
 #define FIRE 6
 #define STEAM 7
 #define LAVA 8
+#define WOOD 9
+#define ASH 10
+#define WOOD_BURNING 11
 
-#define ELEMENT_COUNT (LAVA + 1)
+#define ELEMENT_COUNT (WOOD_BURNING + 1)
 
 #define CLEAR "\033[2J"
 #define CUR_TO_TOP "\033[H"
@@ -55,6 +58,9 @@
 #define BG_WHITE "\033[47m"
 #define BG_GRAY "\033[48;5;240m"
 #define BG_PURPLE "\033[48;5;129m"
+#define BG_BROWN "\033[48;5;94m"
+#define BG_LGRAY "\033[48;5;250m"
+#define BG_ORANGE "\033[48;5;208m"
 
 #define BLACK "\033[30m"
 #define RED "\033[31m"
@@ -66,6 +72,9 @@
 #define WHITE "\033[37m"
 #define GRAY "\033[38;5;240m"
 #define PURPLE "\033[38;5;129m"
+#define BROWN "\033[38;5;94m"
+#define LGRAY "\033[38;5;250m"
+#define ORANGE "\033[38;5;208m"
 
 #define RESET_STYLE "\033[0m"
 

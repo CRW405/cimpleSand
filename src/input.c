@@ -102,6 +102,10 @@ static const MouseStateBinding mouse_state_registry[] = {
 };
 
 static bool apply_element_binding(char key) {
+	if (key == '0') {
+		current_cell = ELEMENT_COUNT - 1;
+		return true;
+	}
 	if (key < '1' || key > ('0' + ELEMENT_COUNT - 1)) {
 		return false;
 	}
@@ -164,14 +168,22 @@ static void handle_mouse_event(const char *seq, int seq_len) {
 		if (parsed_button == 64) {
 			int next = current_cell + 1;
 			if (next >= ELEMENT_COUNT) {
-				next = 1; // Loop back to the first non-empty element
+				next = 1;
 			}
+			if (next == WOOD_BURNING)
+				next++;
+			if (next >= ELEMENT_COUNT)
+				next = 1;
 			current_cell = next;
 		} else if (parsed_button == 65) {
 			int next = current_cell - 1;
 			if (next < 1) {
-				next = ELEMENT_COUNT - 1; // Wrap around to the last element
+				next = ELEMENT_COUNT - 1;
 			}
+			if (next == WOOD_BURNING)
+				next--;
+			if (next < 1)
+				next = ELEMENT_COUNT - 1;
 			current_cell = next;
 		} else {
 			// Only update click tracking if it's not a scroll event
