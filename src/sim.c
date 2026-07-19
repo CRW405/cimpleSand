@@ -155,10 +155,17 @@ void paint(int x_center, int y_center, int radius, char cell) {
 				int x_sym = x_center - dx;
 				int y_sym = y_center - dy;
 
-				set_cell(x, y, cell);
-				set_cell(x_sym, y, cell);
-				set_cell(x, y_sym, cell);
-				set_cell(x_sym, y_sym, cell);
+				if (get_cell(x, y) == EMPTY || cell == EMPTY)
+					set_cell(x, y, cell);
+
+				if (get_cell(x_sym, y) == EMPTY || cell == EMPTY)
+					set_cell(x_sym, y, cell);
+
+				if (get_cell(x, y_sym) == EMPTY || cell == EMPTY)
+					set_cell(x, y_sym, cell);
+
+				if (get_cell(x_sym, y_sym) == EMPTY || cell == EMPTY)
+					set_cell(x_sym, y_sym, cell);
 			}
 		}
 	}
