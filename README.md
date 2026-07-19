@@ -192,5 +192,6 @@ src/
 - Explosions
 - Player character
 - Graphical improvements, color variation, visual effects, etc
+- Multithreading
 - *Future* Velocity
 - *Future* Graphical rendering
