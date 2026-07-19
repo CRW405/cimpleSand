@@ -33,7 +33,7 @@ const Element element_registry[] = {
 	           .bg_color = BG_WHITE,
 	           .color_len = sizeof(WHITE) - 1,
 	           .bg_color_len = sizeof(BG_WHITE) - 1,
-	           .density = 127,
+	           .density = 255,
 	           .sim_fn = NULL      },
 
 	[SAND] = { .name = "Sand",
@@ -57,7 +57,7 @@ const Element element_registry[] = {
                .bg_color = BG_BLUE,
                .color_len = sizeof(BLUE) - 1,
                .bg_color_len = sizeof(BG_BLUE) - 1,
-               .density = 30,
+               .density = 50,
                .sim_fn = sim_water },
 
 	[OIL] = { .name = "Oil",
@@ -65,7 +65,7 @@ const Element element_registry[] = {
 	           .bg_color = BG_PURPLE,
 	           .color_len = sizeof(PURPLE) - 1,
 	           .bg_color_len = sizeof(BG_PURPLE) - 1,
-	           .density = 20,
+	           .density = 10,
 	           .sim_fn = sim_oil   },
 
 	[FIRE] = { .name = "Fire",
@@ -81,7 +81,7 @@ const Element element_registry[] = {
                .bg_color = BG_WHITE,
                .color_len = sizeof(WHITE) - 1,
                .bg_color_len = sizeof(BG_WHITE) - 1,
-               .density = 2,
+               .density = 1,
                .sim_fn = sim_steam },
 
 	[LAVA] = { .name = "Lava",
@@ -89,7 +89,7 @@ const Element element_registry[] = {
 	           .bg_color = BG_RED,
 	           .color_len = sizeof(RED) - 1,
 	           .bg_color_len = sizeof(BG_RED) - 1,
-	           .density = 80,
+	           .density = 50,
 	           .sim_fn = sim_lava  },
 
 	[WOOD] = { .name = "Wood",
@@ -97,24 +97,24 @@ const Element element_registry[] = {
 	           .bg_color = BG_BROWN,
 	           .color_len = sizeof(BROWN) - 1,
 	           .bg_color_len = sizeof(BG_BROWN) - 1,
-	           .density = 90,
-	           .sim_fn = sim_wood },
+	           .density = 100,
+	           .sim_fn = sim_wood  },
 
 	[ASH] = { .name = "Ash",
-	          .color = LGRAY,
-	          .bg_color = BG_LGRAY,
-	          .color_len = sizeof(LGRAY) - 1,
-	          .bg_color_len = sizeof(BG_LGRAY) - 1,
-	          .density = 110,
-	          .sim_fn = sim_ash   },
+	           .color = LGRAY,
+	           .bg_color = BG_LGRAY,
+	           .color_len = sizeof(LGRAY) - 1,
+	           .bg_color_len = sizeof(BG_LGRAY) - 1,
+	           .density = 100,
+	           .sim_fn = sim_ash   },
 
 	[EMBER] = { .name = "Ember",
-	             .color = ORANGE,
-	             .bg_color = BG_ORANGE,
-	             .color_len = sizeof(ORANGE) - 1,
-	             .bg_color_len = sizeof(BG_ORANGE) - 1,
-	             .density = 90,
-	             .sim_fn = sim_ember   }
+               .color = ORANGE,
+               .bg_color = BG_ORANGE,
+               .color_len = sizeof(ORANGE) - 1,
+               .bg_color_len = sizeof(BG_ORANGE) - 1,
+               .density = 100,
+               .sim_fn = sim_ember }
 };
 
 void init_cell_densities(void) {
@@ -134,7 +134,7 @@ static inline void mark_active(int x, int y) {
 		max_active_y = y;
 }
 
-static inline char get_cell(int x, int y) {
+char get_cell(int x, int y) {
 	if (x < 0 || x >= screen_width || y < 0 || y >= screen_height) {
 		return WALL;
 	}
@@ -546,6 +546,18 @@ void sim_wood(int x, int y) {
 }
 
 void sim_ember(int x, int y) {
+	int dx[] = { 0, 0, -1, 1 };
+	int dy[] = { -1, 1, 0, 0 };
+
+	for (int i = 0; i < 4; i++) {
+		char neighbor = get_cell(x + dx[i], y + dy[i]);
+		if (neighbor == WATER) {
+			set_cell(x + dx[i], y + dy[i], STEAM);
+			set_cell(x, y, WOOD);
+			return;
+		}
+	}
+
 	if (rand() % 15 == 0) {
 		if (y - 1 >= 0 && get_cell(x, y - 1) == EMPTY)
 			set_cell(x, y - 1, FIRE);

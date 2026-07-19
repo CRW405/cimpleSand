@@ -24,6 +24,14 @@ extern int max_active_y;
 extern int cell_densities[ELEMENT_COUNT];
 
 /**
+ * @brief Gets the element ID at a grid position, clamping out-of-bounds to WALL.
+ * @param x X coordinate.
+ * @param y Y coordinate.
+ * @return Element ID at (x, y), or WALL if coordinates are out of bounds.
+ */
+char get_cell(int x, int y);
+
+/**
  * @brief Paints a filled circular brush stamp centered at a coordinate.
  * @param x_center Brush center X coordinate.
  * @param y_center Brush center Y coordinate.

@@ -150,13 +150,13 @@ extern int cell_count;
 typedef void (*ElementSimFn)(int x, int y);
 
 typedef struct {
-	const char *name;     /**< Human-readable element name shown in the UI. */
-	const char *color;    /**< ANSI foreground color sequence for rendering. */
-	const char *bg_color; /**< ANSI background color sequence for rendering. */
-	size_t color_len;     /**< Cached byte length of @ref color. */
-	size_t bg_color_len;  /**< Cached byte length of @ref bg_color. */
-	const char density;   /**< Relative density used by movement rules. */
-	ElementSimFn sim_fn;  /**< Per-cell behavior callback, or NULL if static. */
+	const char *name;            /**< Human-readable element name shown in the UI. */
+	const char *color;           /**< ANSI foreground color sequence for rendering. */
+	const char *bg_color;        /**< ANSI background color sequence for rendering. */
+	size_t color_len;            /**< Cached byte length of @ref color. */
+	size_t bg_color_len;         /**< Cached byte length of @ref bg_color. */
+	const unsigned char density; /**< Relative density used by movement rules. */
+	ElementSimFn sim_fn;         /**< Per-cell behavior callback, or NULL if static. */
 } Element;
 
 /** @brief Static registry of all element definitions indexed by element ID. */

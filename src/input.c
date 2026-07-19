@@ -5,6 +5,7 @@ static bool left_mouse_held = false;
 static bool right_mouse_held = false;
 static bool has_mouse_position = false;
 
+extern char get_cell(int x, int y);
 extern void set_cell(int x, int y, char cell);
 extern void paint(int x_center, int y_center, int radius, char cell);
 
@@ -63,8 +64,10 @@ static void paint_at_cursor(char cell) {
 		paint(sim_mouse_x, sim_mouse_y, cur_radius, cell);
 		return;
 	}
-	set_cell(sim_mouse_x, sim_mouse_y, cell);
-	set_cell(sim_mouse_x, sim_mouse_y + 1, cell);
+	if (get_cell(sim_mouse_x, sim_mouse_y) == EMPTY || cell == EMPTY)
+		set_cell(sim_mouse_x, sim_mouse_y, cell);
+	if (get_cell(sim_mouse_x, sim_mouse_y + 1) == EMPTY || cell == EMPTY)
+		set_cell(sim_mouse_x, sim_mouse_y + 1, cell);
 }
 
 static void quit_simulation(void) { running = false; }
