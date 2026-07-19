@@ -181,8 +181,16 @@ src/
 
 ## Notes / planned work
 
-- Add more elements (life)
+- Add more elements:
+    - Gunpowder
+    - Wood
+    - Ash
+    - Acid
+    - Lightning / electricity
+    - Life
 - Tweak liquids, find a better way to handle surface settling
+- Explosions
 - Player character
+- Graphical improvements, color variation, visual effects, etc
 - *Future* Velocity
 - *Future* Graphical rendering
