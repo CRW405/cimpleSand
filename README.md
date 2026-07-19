@@ -53,7 +53,7 @@ Optional FPS target:
 ## Controls
 
 | Input | Action |
-|---|---|---|
+|---|---|
 | `q` | Quit |
 | `1` | Select Wall |
 | `2` | Select Sand |
@@ -61,11 +61,11 @@ Optional FPS target:
 | `4` | Select Wood |
 | `5` | Select Steam |
 | `6` | Select Oil |
-| `Shift 1 (!)` | Select Stone |
-| `Shift 2 (@)`| Select Ash |
-| `Shift 3 (#)` | Select Lava |
-| `Shift 4 ($)` | Select Ember |
-| `Shift 5 (%)` | Select Fire |
+| `Shift 1` | Select Stone |
+| `Shift 2` | Select Ash |
+| `Shift 3` | Select Lava |
+| `Shift 4` | Select Ember |
+| `Shift 5` | Select Fire |
 | `-` / `_` | Decrease brush size |
 | `+` / `=` | Increase brush size |
 | Left click / drag | Paint selected material |
