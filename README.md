@@ -60,10 +60,14 @@ Optional FPS target:
 | `3` | Select Water |
 | `4` | Select Stone |
 | `5` | Select Oil |
+| `6` | Select Fire |
+| `7` | Select Steam |
+| `8` | Select Lava |
 | `-` / `_` | Decrease brush size |
 | `+` / `=` | Increase brush size |
 | Left click / drag | Paint selected material |
 | Right click / drag | Erase (paint Empty) |
+| Mouse wheel | Change selected material (scroll through list) |
 
 ## Technical notes (how it works)
 
@@ -109,11 +113,20 @@ Core simulation behavior:
 Current element rules:
 
 - **Sand**: falls down, then tries diagonal down-left/down-right
-- **Stone**: heavy solid that currently only falls straight down
+- **Stone**: heavy solid that falls straight down
 - **Water**:
   - falls down, then tries diagonals
   - lateral spread search (up to 10 cells) for pooling behavior
   - isolated cells can evaporate randomly (simple anti-stranding behavior)
+- **Oil**: lighter than water; falls down, flows laterally (up to 1 cell), and floats on top of water
+- **Fire**: acts as a gas; rises upward and diagonally, drifts sideways, ignites nearby Oil, and turns Water into Steam. Extinguishes randomly over time.
+- **Steam**: gas that rises and drifts laterally (up to 5 cells); can condense back into Water or dissipate randomly
+- **Lava**: dense liquid; falls and flows slowly (up to 1 cell), turns Water into Steam (solidifying itself into Stone), and ignites nearby Oil
+
+Gas/rise mechanics (used by Fire and Steam):
+- `try_rise_up` / `try_rise_diagonal`: move upward when the cell above is less dense (including empty air)
+- `try_gas_drift` / `try_gas_flow`: move sideways, slipping upward whenever a less dense cell is found above
+- Density-based comparisons work for all movement: heavier (higher density) cells displace lighter ones
 
 ### 4. Rendering pipeline
 
@@ -150,8 +163,11 @@ src/
   sim.c        # element registry, simulation rules, active-region stepping
   sim.h        # simulation API and state bounds
   render.c     # frame assembly, ANSI optimization, HUD output
+  render.h     # render API
   input.c      # non-blocking key handling + SGR mouse parsing/painting
+  input.h      # input API
   term_ops.c   # terminal mode setup/teardown and escape helpers
+  term_ops.h   # terminal ops API
   common.h     # shared constants, globals, types, escape codes
 ```
 
@@ -160,10 +176,13 @@ src/
     - Try zooming out your terminal.
 - Water in a column is slowly evaporating away when it shouldnt.
     - Im aware of this and am looking into it.
+- Paint stuck / erase stuck / cant paint / cant erase.
+    - Try clicking erase or paint again, this should reset the state.
 
 ## Notes / planned work
 
 - Add more elements (life)
 - Tweak liquids, find a better way to handle surface settling
+- Player character
 - *Future* Velocity
 - *Future* Graphical rendering
