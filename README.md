@@ -193,5 +193,9 @@ src/
 - Player character
 - Graphical improvements, color variation, visual effects, etc
 - Multithreading
+- Pause / step mode
 - *Future* Velocity
 - *Future* Graphical rendering
+- *Future* Build out rendering system into a more full fledged library for other projects
+- *Future* World larger than terminal bounds, with camera scrolling
+- *Future* Save/load worlds
