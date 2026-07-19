@@ -47,7 +47,7 @@ Optional FPS target:
 ./build/CimpleSand -f 120
 ```
 
-- `-f 0` resets to default (`240`)
+- `-f 0` resets to default (`60`)
 - Negative values effectively run uncapped (no sleep throttle)
 
 ## Controls
