@@ -212,7 +212,7 @@ void handle_input() {
 			continue;
 		}
 
-		if (input_char == '\e') {
+		if (input_char == (unsigned char)27) {
 			handle_escape_input();
 			continue;
 		}

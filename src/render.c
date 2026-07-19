@@ -6,7 +6,7 @@ static char gui_buffer[256];
 static char *gui(int cell_count) {
 	snprintf(gui_buffer, sizeof(gui_buffer),
 	         "FPS: %d/%d | Cells: %d | Last Input: %c | Mouse: %d, %d (%d) | "
-	         "Selected: %d (%s) | Brush Size: %d\e[K",
+	         "Selected: %d (%s) | Brush Size: %d\033[K",
 	         fps, target_fps, cell_count, last_input, mouse_x, mouse_y,
 	         sim_mouse_y, current_cell, element_registry[current_cell].name,
 	         cur_radius);
