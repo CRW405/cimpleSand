@@ -102,15 +102,20 @@ static const MouseStateBinding mouse_state_registry[] = {
 };
 
 static bool apply_element_binding(char key) {
-	if (key == '0') {
-		current_cell = ELEMENT_COUNT - 1;
-		return true;
+	switch (key) {
+	case '1': current_cell = WALL;  return true;
+	case '2': current_cell = SAND;  return true;
+	case '3': current_cell = WATER; return true;
+	case '4': current_cell = WOOD;  return true;
+	case '5': current_cell = STEAM; return true;
+	case '6': current_cell = OIL;   return true;
+	case '!': current_cell = STONE; return true;
+	case '@': current_cell = ASH;   return true;
+	case '#': current_cell = LAVA;  return true;
+	case '$': current_cell = EMBER; return true;
+	case '%': current_cell = FIRE;  return true;
+	default:  return false;
 	}
-	if (key < '1' || key > ('0' + ELEMENT_COUNT - 1)) {
-		return false;
-	}
-	current_cell = key - '0';
-	return true;
 }
 
 static void apply_key_binding(char key) {
@@ -170,20 +175,12 @@ static void handle_mouse_event(const char *seq, int seq_len) {
 			if (next >= ELEMENT_COUNT) {
 				next = 1;
 			}
-			if (next == WOOD_BURNING)
-				next++;
-			if (next >= ELEMENT_COUNT)
-				next = 1;
 			current_cell = next;
 		} else if (parsed_button == 65) {
 			int next = current_cell - 1;
 			if (next < 1) {
 				next = ELEMENT_COUNT - 1;
 			}
-			if (next == WOOD_BURNING)
-				next--;
-			if (next < 1)
-				next = ELEMENT_COUNT - 1;
 			current_cell = next;
 		} else {
 			// Only update click tracking if it's not a scroll event

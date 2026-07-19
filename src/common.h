@@ -31,9 +31,9 @@
 #define LAVA 8
 #define WOOD 9
 #define ASH 10
-#define WOOD_BURNING 11
+#define EMBER 11
 
-#define ELEMENT_COUNT (WOOD_BURNING + 1)
+#define ELEMENT_COUNT (EMBER + 1)
 
 #define CLEAR "\033[2J"
 #define CUR_TO_TOP "\033[H"

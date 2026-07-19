@@ -53,18 +53,19 @@ Optional FPS target:
 ## Controls
 
 | Input | Action |
-|---|---|
+|---|---|---|
 | `q` | Quit |
 | `1` | Select Wall |
 | `2` | Select Sand |
 | `3` | Select Water |
-| `4` | Select Stone |
-| `5` | Select Oil |
-| `6` | Select Fire |
-| `7` | Select Steam |
-| `8` | Select Lava |
-| `9` | Select Wood |
-| `0` | Select Ash |
+| `4` | Select Wood |
+| `5` | Select Steam |
+| `6` | Select Oil |
+| `Shift 1 (!)` | Select Stone |
+| `Shift 2 (@)`| Select Ash |
+| `Shift 3 (#)` | Select Lava |
+| `Shift 4 ($)` | Select Ember |
+| `Shift 5 (%)` | Select Fire |
 | `-` / `_` | Decrease brush size |
 | `+` / `=` | Increase brush size |
 | Left click / drag | Paint selected material |
@@ -125,7 +126,7 @@ Current element rules:
 - **Steam**: gas that rises and drifts laterally (up to 5 cells); can condense back into Water or dissipate randomly
 - **Lava**: dense liquid; falls and flows slowly (up to 1 cell), turns Water into Steam (solidifying itself into Stone), and ignites nearby Oil
 - **Wood**: static solid; instantly ignites (becomes **Wood (Burning)**) when adjacent to Fire or Lava
-- **Wood (Burning)**: orange ember stage; occasionally spawns a Fire cell above (visual flame), then after ~2 seconds collapses into **Ash**
+- **Ember**: orange burning stage of Wood; occasionally spawns a Fire cell above (visual flame), then after ~2 seconds collapses into **Ash**
 - **Ash**: dense falling solid (density 110); falls straight down and diagonally — heavier than Sand so nothing sinks through it
 
 Gas/rise mechanics (used by Fire and Steam):

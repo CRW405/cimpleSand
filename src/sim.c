@@ -17,7 +17,7 @@ void sim_steam(int x, int y);
 void sim_lava(int x, int y);
 void sim_wood(int x, int y);
 void sim_ash(int x, int y);
-void sim_wood_burning(int x, int y);
+void sim_ember(int x, int y);
 
 const Element element_registry[] = {
 	[EMPTY] = { .name = "Empty",
@@ -108,13 +108,13 @@ const Element element_registry[] = {
 	          .density = 110,
 	          .sim_fn = sim_ash   },
 
-	[WOOD_BURNING] = { .name = "Wood (Burning)",
-	                   .color = ORANGE,
-	                   .bg_color = BG_ORANGE,
-	                   .color_len = sizeof(ORANGE) - 1,
-	                   .bg_color_len = sizeof(BG_ORANGE) - 1,
-	                   .density = 90,
-	                   .sim_fn = sim_wood_burning }
+	[EMBER] = { .name = "Ember",
+	             .color = ORANGE,
+	             .bg_color = BG_ORANGE,
+	             .color_len = sizeof(ORANGE) - 1,
+	             .bg_color_len = sizeof(BG_ORANGE) - 1,
+	             .density = 90,
+	             .sim_fn = sim_ember   }
 };
 
 void init_cell_densities(void) {
@@ -469,7 +469,7 @@ void sim_fire(int x, int y) {
 			set_cell(nx, ny, FIRE);
 			return;
 		case WOOD:
-			set_cell(nx, ny, WOOD_BURNING);
+			set_cell(nx, ny, EMBER);
 			break;
 		}
 	}
@@ -524,7 +524,7 @@ void sim_lava(int x, int y) {
 			set_cell(nx, ny, FIRE);
 			return;
 		case WOOD:
-			set_cell(nx, ny, WOOD_BURNING);
+			set_cell(nx, ny, EMBER);
 			break;
 		}
 	}
@@ -539,13 +539,13 @@ void sim_wood(int x, int y) {
 	for (int i = 0; i < 8; i++) {
 		char neighbor = get_cell(x + dx[i], y + dy[i]);
 		if (neighbor == FIRE || neighbor == LAVA) {
-			set_cell(x, y, WOOD_BURNING);
+			set_cell(x, y, EMBER);
 			return;
 		}
 	}
 }
 
-void sim_wood_burning(int x, int y) {
+void sim_ember(int x, int y) {
 	if (rand() % 15 == 0) {
 		if (y - 1 >= 0 && get_cell(x, y - 1) == EMPTY)
 			set_cell(x, y - 1, FIRE);
