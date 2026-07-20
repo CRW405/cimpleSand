@@ -1,14 +1,6 @@
 # CimpleSand
 
-**CimpleSand** is a real-time falling-sand simulation written in pure C that runs entirely in the terminal.
-
-## Description
-
-This is a fun project for me to get better with C by building an idea I have wanted to make for a while.
-
-The main highlight is the technical side: custom terminal rendering, raw input handling (including SGR mouse), and a density-based cellular sim loop tuned to run at high FPS in a normal terminal.
-
-Now has turned into a side project and "proper" C and optimization practice.
+**CimpleSand** is a real-time falling-sand cellular automaton simulation written in pure C that runs entirely in the terminal.
 
 ## Build and run
 
@@ -32,174 +24,136 @@ cmake --build build
 ./build/CimpleSand
 ```
 
-Optional simulation size:
+Optional flags:
 
-```bash
-./build/CimpleSand -w 100 -h 100
-```
-
-- If `-w` / `-h` are omitted, the sim auto-fits terminal bounds.
-- If you pass values larger than terminal bounds, they are clamped down to fit.
-
-Optional FPS target:
-
-```bash
-./build/CimpleSand -f 120
-```
-
-- `-f 0` resets to default (`60`)
-- Negative values effectively run uncapped (no sleep throttle)
+| Flag | Description |
+|------|-------------|
+| `-w <width>` | Simulation grid width (auto-fits terminal if omitted) |
+| `-h <height>` | Simulation grid height (auto-fits terminal if omitted) |
+| `-f <fps>`  | Target FPS (default 60; `-f 0` resets to 60; negative = uncapped) |
 
 ## Controls
 
 | Input | Action |
 |---|---|
 | `q` | Quit |
-| `1` | Select Wall |
-| `2` | Select Sand |
-| `3` | Select Water |
-| `4` | Select Wood |
-| `5` | Select Steam |
-| `6` | Select Oil |
-| `Shift 1 (!)` | Select Stone |
-| `Shift 2 (@)` | Select Ash |
-| `Shift 3 (#)` | Select Lava |
-| `Shift 4 ($)` | Select Ember |
-| `Shift 5 (%)` | Select Fire |
+| `1` | Wall |
+| `2` | Sand |
+| `3` | Water |
+| `4` | Wood |
+| `5` | Steam |
+| `6` | Oil |
+| `7` | Gunpowder |
+| `Shift+1` (`!`) | Stone |
+| `Shift+2` (`@`) | Ash |
+| `Shift+3` (`#`) | Lava |
+| `Shift+4` (`$`) | Ember |
+| `Shift+5` (`%`) | Fire |
 | `-` / `_` | Decrease brush size |
 | `+` / `=` | Increase brush size |
 | Left click / drag | Paint selected material |
 | Right click / drag | Erase (paint Empty) |
-| Mouse wheel | Change selected material (scroll through list) |
+| Mouse wheel | Cycle selected material |
 
-## Technical notes (how it works)
+## Elements (13 types)
 
-### 1. Terminal setup and lifecycle
+| Element | Type | Behavior |
+|---|---|---|
+| **Wall** | Static | Indestructible barrier |
+| **Sand** | Solid | Falls straight down, slides diagonally |
+| **Stone** | Solid | Heavy — falls straight down |
+| **Gunpowder** | Solid (explosive) | Falls like sand; ignites with chain-reaction explosion when near Fire/Lava |
+| **Ash** | Solid | Falls down/diagonal |
+| **Water** | Liquid | Falls, spreads laterally (up to 10 cells), evaporates when isolated |
+| **Oil** | Liquid | Lighter than water — floats on top; limited lateral spread (1 cell) |
+| **Lava** | Liquid | Falls and spreads slowly; turns Water to Steam (solidifying into Stone), ignites Oil/Wood |
+| **Fire** | Gas | Rises, drifts, ignites Oil/Wood/Gunpowder, turns Water to Steam, extinguishes randomly |
+| **Steam** | Gas | Rises, drifts laterally (up to 5 cells), condenses back to Water |
+| **Wood** | Static | Ignites (becomes Ember) when adjacent to Fire/Lava |
+| **Ember** | Static | Burning Wood — spawns Fire above, collapses to Ash after ~2 seconds |
+| **Empty** | — | Erasable space |
 
-At startup the app:
+## Technical notes
 
-- switches to the alternate screen buffer
-- hides the cursor
-- enables SGR mouse + mouse motion reporting + focus events
-- enables raw terminal mode (`ICANON` and `ECHO` disabled)
+### Terminal setup
 
-On exit (`q` or `SIGINT`), terminal state is restored (cursor, main screen, modes, termios).
+At startup the app switches to the alternate screen buffer, hides the cursor, enables SGR mouse + motion reporting + focus events, and enables raw terminal mode (`ICANON` + `ECHO` disabled). On exit (`q` or `SIGINT`) everything is restored.
 
-### 2. Data layout
+### Data layout
 
-- The world is one contiguous `unsigned char *grid`.
-- One byte stores:
-  - lower 7 bits: element id
-  - top bit: active marker used during per-frame swaps
-- Elements are declared in `element_registry[]` with:
-  - display name
-  - ANSI fg/bg colors (plus cached string lengths)
-  - density
-  - optional simulation function pointer
+- The world is a contiguous `unsigned char *grid`.
+- One byte stores: lower 7 bits = element ID, top bit = active marker used during per-frame swaps.
+- Elements are declared in `element_registry[]` with name, ANSI colors, density, and simulation function pointer.
 
-This keeps lookups cheap and makes element behavior table-driven.
+### Simulation step
 
-### 3. Simulation step
+The main loop runs `simulate()` → `render()` → `handle_input()`.
 
-The main loop does: `simulate()` -> `render()` -> `handle_input()`.
+- Processed bottom-up so gravity looks stable.
+- Horizontal scan direction alternates every frame to reduce directional bias.
+- Movement is density-based — heavier cells displace lighter ones.
+- Simulation work is restricted to an active region (`min/max_active_*`) with a one-cell margin instead of scanning the full grid.
+- Swaps set active bits on both cells to prevent same-frame double updates; bits are cleared after the region pass.
 
-Core simulation behavior:
+### Explosion system (Gunpowder)
 
-- processed bottom-up (`y = height - 1` to `0`) so gravity looks stable
-- horizontal scan direction alternates every frame to reduce directional bias
-- movement is density-based using precomputed `cell_densities[]`
-- simulation work is restricted to an active region (`min/max_active_*`) with a
-  one-cell margin, instead of scanning the full grid every frame
-- swaps set active bits on both cells to prevent same-frame double updates
-- active bits are cleared after the region pass
+When ignited, Gunpowder triggers a BFS-based chain reaction:
+- Scans outward through adjacent Gunpowder cells up to a configurable limit.
+- Blast force is density-scaled and applied radially — nearby cells are destroyed, damaged, or scorched depending on distance.
+- Debris (Ember/Fire) is scattered outward from the blast center.
 
-Current element rules:
+### Rendering
 
-- **Sand**: falls down, then tries diagonal down-left/down-right
-- **Stone**: heavy solid that falls straight down
-- **Water**:
-  - falls down, then tries diagonals
-  - lateral spread search (up to 10 cells) for pooling behavior
-  - isolated cells can evaporate randomly (simple anti-stranding behavior)
-- **Oil**: lighter than water; falls down, flows laterally (up to 1 cell), and floats on top of water
-- **Fire**: acts as a gas; rises upward and diagonally, drifts sideways, ignites nearby Oil, and turns Water into Steam. Extinguishes randomly over time.
-- **Steam**: gas that rises and drifts laterally (up to 5 cells); can condense back into Water or dissipate randomly
-- **Lava**: dense liquid; falls and flows slowly (up to 1 cell), turns Water into Steam (solidifying itself into Stone), and ignites nearby Oil
-- **Wood**: static solid; instantly ignites (becomes **Wood (Burning)**) when adjacent to Fire or Lava
-- **Ember**: orange burning stage of Wood; occasionally spawns a Fire cell above (visual flame), then after ~2 seconds collapses into **Ash**
-- **Ash**: dense falling solid (density 110); falls straight down and diagonally — heavier than Sand so nothing sinks through it
+Uses Unicode half-block `▄` to pack two sim cells per terminal character row (top → background, bottom → foreground). For each frame:
+- Cursor resets to top (`\e[H`).
+- Rows are rasterized into a `frame_buffer` with redundant ANSI color writes skipped by tracking last fg/bg per row.
+- A HUD line is appended (FPS, cell count, selected element, brush size, mouse coordinates).
+- A single `write()` flushes the full frame buffer.
 
-Gas/rise mechanics (used by Fire and Steam):
-- `try_rise_up` / `try_rise_diagonal`: move upward when the cell above is less dense (including empty air)
-- `try_gas_drift` / `try_gas_flow`: move sideways, slipping upward whenever a less dense cell is found above
-- Density-based comparisons work for all movement: heavier (higher density) cells displace lighter ones
+### Input
 
-### 4. Rendering pipeline
-
-Rendering uses the Unicode half block `▄` and packs two sim cells into one terminal character row:
-
-- top sim cell -> terminal background color
-- bottom sim cell -> terminal foreground color
-
-For each frame:
-
-- cursor is reset to top (`\e[H`)
-- rows are rasterized into one large `frame_buffer`
-- redundant ANSI color writes are skipped by tracking last fg/bg per row
-- a HUD line is appended (FPS, selected element, brush size, mouse info)
-- one `write()` flushes the full frame buffer to stdout
-
-This reduces terminal I/O calls and keeps flicker low.
-
-### 5. Input handling
-
-Input is non-blocking (`select`) in raw mode:
-
-- single-key controls for tools/materials
-- escape sequence parsing for arrows/mouse
-- SGR mouse parsing (`\e[<...M/m`) for button press/release + drag painting
-
-Mouse coordinates are mapped from terminal rows to sim rows (`sim_y = (mouse_y - 1) * 2`) to match the half-block render model.
+Non-blocking (`select()`) in raw mode:
+- Single-key bindings for material selection.
+- Escape sequence parsing for SGR mouse (`\e[<...M/m`) — supports click/drag painting and scroll wheel.
+- Right-click erases (paints Empty).
 
 ## Project structure
 
-```text
+```
 src/
-  main.c       # entrypoint, grid init, terminal lifecycle, frame timing
-  sim.c        # element registry, simulation rules, active-region stepping
-  sim.h        # simulation API and state bounds
-  render.c     # frame assembly, ANSI optimization, HUD output
-  render.h     # render API
-  input.c      # non-blocking key handling + SGR mouse parsing/painting
-  input.h      # input API
-  term_ops.c   # terminal mode setup/teardown and escape helpers
-  term_ops.h   # terminal ops API
-  common.h     # shared constants, globals, types, escape codes
+  main.c             # Entry point, grid init, CLI args, terminal lifecycle, frame timing
+  sim.c              # Core simulation engine, active-region tracking
+  sim.h              # Simulation API
+  element.c          # Per-element behavior functions
+  element.h          # Element simulation declarations
+  element_utils.c    # Movement primitives (fall, flow, rise, drift) and explosion system
+  element_utils.h    # Movement utility declarations
+  element_registry.c # Static element definitions table (name, color, density, sim_fn)
+  render.c           # Frame assembly, ANSI optimization, HUD
+  render.h           # Render API
+  input.c            # Non-blocking input, keyboard bindings, SGR mouse parsing
+  input.h            # Input API
+  term_ops.c         # Terminal mode setup/teardown, ANSI helpers
+  term_ops.h         # Terminal ops API
+  common.h           # Shared constants, types, globals, ANSI codes
 ```
 
-## Problems
-- Screen stripey / glitchy / broken.
-    - Try zooming out your terminal.
-- Water in a column is slowly evaporating away when it shouldnt.
-    - Im aware of this and am looking into it.
-- Paint stuck / erase stuck / cant paint / cant erase.
-    - Try clicking erase or paint again, this should reset the state.
+## Known problems
 
-## Notes / planned work
+- **Stripey/glitchy display** — try zooming out your terminal.
+- **Water evaporating in a column** — im aware of this and looking into it.
+- **Paint/erase stuck** — try clicking erase or paint again to reset state.
 
-- Add more elements:
-    - Gunpowder
-    - Acid
-    - Lightning / electricity
-    - Life
-- Tweak liquids, find a better way to handle surface settling
-- Explosions
+## Planned work
+
+### TODO:
+
+- More elements: Acid, Lightning, Life
 - Player character
-- Graphical improvements, color variation, visual effects, etc
 - Multithreading
 - Pause / step mode
-- *Future* Velocity
-- *Future* Graphical rendering
-- *Future* Build out rendering system into a more full fledged library for other projects
-- *Future* World larger than terminal bounds, with camera scrolling
-- *Future* Save/load worlds
+- GUI improvements: menu system, help screen (`h`), options (`o`)
+- Velocity system
+- Graphical rendering
+- World larger than terminal bounds with camera scrolling
+- Save/load worlds

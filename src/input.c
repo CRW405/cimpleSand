@@ -5,10 +5,6 @@ static bool left_mouse_held = false;
 static bool right_mouse_held = false;
 static bool has_mouse_position = false;
 
-extern char get_cell(int x, int y);
-extern void set_cell(int x, int y, char cell);
-extern void paint(int x_center, int y_center, int radius, char cell);
-
 enum {
 	ESCAPE_SEQUENCE_CAPACITY = 64,
 	MOUSE_SEQUENCE_OFFSET = 2,
@@ -109,9 +105,10 @@ static bool apply_element_binding(char key) {
 	case '1': current_cell = WALL;  return true;
 	case '2': current_cell = SAND;  return true;
 	case '3': current_cell = WATER; return true;
-	case '4': current_cell = WOOD;  return true;
-	case '5': current_cell = STEAM; return true;
-	case '6': current_cell = OIL;   return true;
+	case '4': current_cell = WOOD;    return true;
+	case '5': current_cell = STEAM;   return true;
+	case '6': current_cell = OIL;     return true;
+	case '7': current_cell = GUNPOWDER; return true;
 	case '!': current_cell = STONE; return true;
 	case '@': current_cell = ASH;   return true;
 	case '#': current_cell = LAVA;  return true;

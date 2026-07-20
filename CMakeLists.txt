@@ -10,5 +10,8 @@ add_executable(CimpleSand
     src/input.c
     src/render.c
     src/sim.c
+    src/element.c
+    src/element_registry.c
+    src/element_utils.c
 )
 

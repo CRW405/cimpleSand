@@ -32,8 +32,9 @@
 #define WOOD 9
 #define ASH 10
 #define EMBER 11
+#define GUNPOWDER 12
 
-#define ELEMENT_COUNT (EMBER + 1)
+#define ELEMENT_COUNT (GUNPOWDER + 1)
 
 #define CLEAR "\033[2J"
 #define CUR_TO_TOP "\033[H"
@@ -75,6 +76,8 @@
 #define BROWN "\033[38;5;94m"
 #define LGRAY "\033[38;5;250m"
 #define ORANGE "\033[38;5;208m"
+#define BG_DKOLIVE "\033[48;5;58m"
+#define DKOLIVE "\033[38;5;58m"
 
 #define RESET_STYLE "\033[0m"
 
