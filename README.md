@@ -59,19 +59,19 @@ Optional flags:
 
 | Element | Type | Behavior |
 |---|---|---|
-| **Wall** | Static | Indestructible barrier |
+| **Wall** | Static | Barrier |
 | **Sand** | Solid | Falls straight down, slides diagonally |
 | **Stone** | Solid | Heavy — falls straight down |
 | **Gunpowder** | Solid (explosive) | Falls like sand; ignites with chain-reaction explosion when near Fire/Lava |
-| **Ash** | Solid | Falls down/diagonal |
+| **Ash** | Solid | Falls down/diagonal, created from burning wood |
 | **Water** | Liquid | Falls, spreads laterally (up to 10 cells), evaporates when isolated |
-| **Oil** | Liquid | Lighter than water — floats on top; limited lateral spread (1 cell) |
+| **Oil** | Liquid | Lighter than water — floats on top |
 | **Lava** | Liquid | Falls and spreads slowly; turns Water to Steam (solidifying into Stone), ignites Oil/Wood |
 | **Fire** | Gas | Rises, drifts, ignites Oil/Wood/Gunpowder, turns Water to Steam, extinguishes randomly |
 | **Steam** | Gas | Rises, drifts laterally (up to 5 cells), condenses back to Water |
 | **Wood** | Static | Ignites (becomes Ember) when adjacent to Fire/Lava |
 | **Ember** | Static | Burning Wood — spawns Fire above, collapses to Ash after ~2 seconds |
-| **Empty** | — | Erasable space |
+| **Empty** | — | Empty space |
 
 ## Technical notes
 
@@ -149,6 +149,7 @@ src/
 ### TODO:
 
 - More elements: Acid, Lightning, Life
+- Rework explosions to account for thin lines of explosives
 - Player character
 - Multithreading
 - Pause / step mode
