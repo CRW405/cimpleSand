@@ -1,15 +1,26 @@
 #include "render.h"
+#include "player.h"
 #include "term_ops.h"
 
 static char gui_buffer[256];
 
 static char *gui(int cell_count) {
-	snprintf(gui_buffer, sizeof(gui_buffer),
-	         "FPS: %d/%d | Cells: %d | Last Input: %c | Mouse: %d, %d (%d) | "
-	         "Selected: %d (%s) | Brush Size: %d\033[K",
-	         fps, target_fps, cell_count, last_input, mouse_x, mouse_y,
-	         sim_mouse_y, current_cell, element_registry[current_cell].name,
-	         cur_radius);
+	if (enable_player) {
+		snprintf(gui_buffer, sizeof(gui_buffer),
+		         "FPS: %d/%d | Cells: %d  | Mouse: %d, %d (%d) | "
+		         "Selected: %d (%s) | Brush Size: %d | Player: (%d,%d) Jumps: %d%s\033[K",
+		         fps, target_fps, cell_count, mouse_x, mouse_y,
+		         sim_mouse_y, current_cell, element_registry[current_cell].name,
+		         cur_radius, player.x, player.y, player.jump_count,
+		         player.in_liquid ? " Swimming" : (player.grounded ? " Grounded" : " Airborne"));
+	} else {
+		snprintf(gui_buffer, sizeof(gui_buffer),
+		         "FPS: %d/%d | Cells: %d | Mouse: %d, %d (%d) | "
+		         "Selected: %d (%s) | Brush Size: %d\033[K",
+		         fps, target_fps, cell_count, mouse_x, mouse_y, sim_mouse_y,
+		         current_cell, element_registry[current_cell].name, cur_radius);
+	}
+
 	return gui_buffer;
 }
 
@@ -34,18 +45,30 @@ void render() {
 
 			unsigned char bottom_cell = grid[bot_row_index + x] & ACTIVE_MASK;
 
-			if (element_registry[top_cell].bg_color != last_top_color) {
-				size_t len = element_registry[top_cell].bg_color_len;
-				memcpy(frame_buffer + frame_buffer_offset, element_registry[top_cell].bg_color, len);
-				frame_buffer_offset += len;
-				last_top_color = element_registry[top_cell].bg_color;
+			const char *top_bg = element_registry[top_cell].bg_color;
+			size_t top_bg_len = element_registry[top_cell].bg_color_len;
+			if (player_occupies(x, y)) {
+				top_bg = player.bg_color;
+				top_bg_len = strlen(player.bg_color);
 			}
 
-			if (element_registry[bottom_cell].color != last_bottom_color) {
-				size_t len = element_registry[bottom_cell].color_len;
-				memcpy(frame_buffer + frame_buffer_offset, element_registry[bottom_cell].color, len);
-				frame_buffer_offset += len;
-				last_bottom_color = element_registry[bottom_cell].color;
+			const char *bottom_fg = element_registry[bottom_cell].color;
+			size_t bottom_fg_len = element_registry[bottom_cell].color_len;
+			if (player_occupies(x, y + 1)) {
+				bottom_fg = player.color;
+				bottom_fg_len = strlen(player.color);
+			}
+
+			if (top_bg != last_top_color) {
+				memcpy(frame_buffer + frame_buffer_offset, top_bg, top_bg_len);
+				frame_buffer_offset += top_bg_len;
+				last_top_color = top_bg;
+			}
+
+			if (bottom_fg != last_bottom_color) {
+				memcpy(frame_buffer + frame_buffer_offset, bottom_fg, bottom_fg_len);
+				frame_buffer_offset += bottom_fg_len;
+				last_bottom_color = bottom_fg;
 			}
 
 			memcpy(frame_buffer + frame_buffer_offset, "▄", 3);

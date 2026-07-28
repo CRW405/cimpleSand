@@ -13,6 +13,19 @@ enum {
 	SIM_Y_SCALE = 2
 };
 
+/* Kitty keyboard protocol (CSI u progressive enhancement) is required, not
+ * negotiated: 1 = disambiguate escape codes, 2 = report event types
+ * (press/repeat/release), 8 = report all keys (incl. plain letters) as
+ * escape codes, 16 = report associated UTF-8 text so shifted symbols (e.g.
+ * Shift+1 -> '!') round-trip correctly. This gives real held/released state
+ * for every key with no timeout heuristics; terminals without support won't
+ * report movement keys at all. */
+#define KITTY_FLAGS (1 | 2 | 8 | 16)
+
+static bool held[KEY_ACTION_COUNT];
+static bool held_prev[KEY_ACTION_COUNT];
+static bool shift_for_key[KEY_ACTION_COUNT];
+
 typedef void (*KeyAction)(void);
 
 typedef struct {
@@ -32,11 +45,34 @@ typedef struct {
 	bool value;
 } MouseStateBinding;
 
+static void
+set_key(GameKey key, bool active, bool shift) {
+	held[key] = active;
+	if (active) {
+		shift_for_key[key] = shift;
+	}
+}
+
+bool key_held(GameKey key) { return held[key]; }
+
+bool key_just_pressed(GameKey key) { return held[key] && !held_prev[key]; }
+
+bool sprint_held(void) {
+	return (held[KEY_LEFT] && shift_for_key[KEY_LEFT]) ||
+	       (held[KEY_RIGHT] && shift_for_key[KEY_RIGHT]);
+}
+
+static void snapshot_prev_keys(void) {
+	for (int k = 0; k < KEY_ACTION_COUNT; k++) {
+		held_prev[k] = held[k];
+	}
+}
+
 static int read_char(char *out) { return read(STDIN_FILENO, out, 1); }
 
 static bool is_escape_terminator(char c) {
 	return c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'M' ||
-	       c == 'm' || c == 'I' || c == 'O';
+	       c == 'm' || c == 'I' || c == 'O' || c == 'u';
 }
 
 static int read_escape_sequence(char *seq, size_t seq_size) {
@@ -102,19 +138,44 @@ static const MouseStateBinding mouse_state_registry[] = {
 
 static bool apply_element_binding(char key) {
 	switch (key) {
-	case '1': current_cell = WALL;  return true;
-	case '2': current_cell = SAND;  return true;
-	case '3': current_cell = WATER; return true;
-	case '4': current_cell = WOOD;    return true;
-	case '5': current_cell = STEAM;   return true;
-	case '6': current_cell = OIL;     return true;
-	case '7': current_cell = GUNPOWDER; return true;
-	case '!': current_cell = STONE; return true;
-	case '@': current_cell = ASH;   return true;
-	case '#': current_cell = LAVA;  return true;
-	case '$': current_cell = EMBER; return true;
-	case '%': current_cell = FIRE;  return true;
-	default:  return false;
+	case '1':
+		current_cell = WALL;
+		return true;
+	case '2':
+		current_cell = SAND;
+		return true;
+	case '3':
+		current_cell = WATER;
+		return true;
+	case '4':
+		current_cell = WOOD;
+		return true;
+	case '5':
+		current_cell = STEAM;
+		return true;
+	case '6':
+		current_cell = OIL;
+		return true;
+	case '7':
+		current_cell = GUNPOWDER;
+		return true;
+	case '!':
+		current_cell = STONE;
+		return true;
+	case '@':
+		current_cell = ASH;
+		return true;
+	case '#':
+		current_cell = LAVA;
+		return true;
+	case '$':
+		current_cell = EMBER;
+		return true;
+	case '%':
+		current_cell = FIRE;
+		return true;
+	default:
+		return false;
 	}
 }
 
@@ -191,6 +252,101 @@ static void handle_mouse_event(const char *seq, int seq_len) {
 	last_input = event_type;
 }
 
+/* Movement/jump/respawn keys get real held-state tracking (with the shift
+ * modifier recorded per-key for sprint detection). Everything else is a
+ * one-shot action, so it's routed through the exact same dispatch path a
+ * plain byte would have used - this keeps every non-movement control (quit,
+ * material selection, brush size) working identically whether or not the
+ * terminal is escaping plain keys via the Kitty protocol. */
+static void update_key_state(int key_code, bool shift, int event_type, int text_cp) {
+	bool active = (event_type != 3);
+
+	switch (key_code) {
+	case 'a':
+	case 'A':
+		set_key(KEY_LEFT, active, shift);
+		return;
+	case 'd':
+	case 'D':
+		set_key(KEY_RIGHT, active, shift);
+		return;
+	case 'w':
+	case 'W':
+		set_key(KEY_UP, active, shift);
+		return;
+	case 's':
+	case 'S':
+		set_key(KEY_DOWN, active, shift);
+		return;
+	case ' ':
+		set_key(KEY_JUMP, active, shift);
+		return;
+	case 'r':
+	case 'R':
+		set_key(KEY_RESPAWN, active, shift);
+		return;
+	default:
+		break;
+	}
+
+	if (!active) {
+		return;
+	}
+
+	char c = (char)(text_cp ? text_cp : key_code);
+	apply_key_binding(c);
+	last_input = c;
+}
+
+/* Parses a Kitty keyboard protocol CSI u body of the form
+ * "key[:alt:base][;mods[:event]][;text[:more]]" (already stripped of the
+ * leading '[' and trailing 'u' by the caller). */
+static void handle_kitty_key_event(char *params) {
+	char *semi1 = strchr(params, ';');
+	if (semi1) {
+		*semi1 = '\0';
+	}
+	char *key_colon = strchr(params, ':');
+	if (key_colon) {
+		*key_colon = '\0';
+	}
+	int key_code = atoi(params);
+
+	int modifiers = 1;
+	int event_type = 1;
+	int text_cp = 0;
+
+	if (semi1) {
+		char *mod_part = semi1 + 1;
+		char *semi2 = strchr(mod_part, ';');
+		if (semi2) {
+			*semi2 = '\0';
+		}
+		char *mod_colon = strchr(mod_part, ':');
+		if (mod_colon) {
+			event_type = atoi(mod_colon + 1);
+			*mod_colon = '\0';
+		}
+		if (*mod_part) {
+			modifiers = atoi(mod_part);
+		}
+
+		if (semi2) {
+			char *text_part = semi2 + 1;
+			char *text_colon = strchr(text_part, ':');
+			if (text_colon) {
+				*text_colon = '\0';
+			}
+			if (*text_part) {
+				text_cp = atoi(text_part);
+			}
+		}
+	}
+
+	bool shift = ((modifiers - 1) & 1) != 0;
+	update_key_state(key_code, shift, event_type, text_cp);
+}
+
 static void handle_escape_input(void) {
 	char seq[ESCAPE_SEQUENCE_CAPACITY];
 	int seq_len = read_escape_sequence(seq, sizeof(seq));
@@ -203,7 +359,26 @@ static void handle_escape_input(void) {
 		return;
 	}
 
+	if (seq[seq_len - 1] == 'u') {
+		seq[seq_len - 1] = '\0';
+		handle_kitty_key_event(seq + 1);
+		return;
+	}
+
 	apply_arrow_binding(seq);
+}
+
+void init_input(void) {
+	char enable[16];
+	int len = snprintf(enable, sizeof(enable), "\033[>%uu", (unsigned)KITTY_FLAGS);
+	if (len > 0) {
+		write(STDOUT_FILENO, enable, (size_t)len);
+	}
+}
+
+void shutdown_input(void) {
+	const char pop[] = "\033[<u";
+	write(STDOUT_FILENO, pop, sizeof(pop) - 1);
 }
 
 int isInput(void) {
@@ -215,6 +390,8 @@ int isInput(void) {
 }
 
 void handle_input() {
+	snapshot_prev_keys();
+
 	while (isInput()) {
 		char input_char = '\0';
 		if (read_char(&input_char) != 1) {

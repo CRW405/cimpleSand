@@ -8,6 +8,7 @@ add_executable(CimpleSand
     src/main.c
     src/term_ops.c
     src/input.c
+    src/player.c
     src/render.c
     src/sim.c
     src/element.c

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "input.h"
+#include "player.h"
 #include "render.h"
 #include "sim.h"
 #include "term_ops.h"
@@ -21,6 +22,7 @@ int sim_mouse_x = 0;
 int sim_mouse_y = 0;
 int cur_radius = 1;
 int cell_count = 0;
+bool enable_player = false;
 
 void handle_sigint(int sig) {
 	(void)sig;
@@ -56,8 +58,9 @@ int main(int argc, char *argv[]) {
 	bool height_set = false;
 	int term_width = 0;
 	int term_height = 0;
+	enable_player = false;
 
-	while ((opt = getopt(argc, argv, "w:h:f:")) != -1) {
+	while ((opt = getopt(argc, argv, "w:h:f:p")) != -1) {
 		switch (opt) {
 		case 'w':
 			set_width = atoi(optarg) > 1 ? atoi(optarg) : set_width;
@@ -69,6 +72,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'f':
 			target_fps = atoi(optarg) != 0 ? atoi(optarg) : TARGET_FPS;
+			break;
+		case 'p':
+			enable_player = true;
 			break;
 		}
 	}
@@ -86,6 +92,9 @@ int main(int argc, char *argv[]) {
 
 	signal(SIGINT, handle_sigint);
 	init_grid(set_width, set_height);
+	if (enable_player) {
+		init_player();
+	}
 	init_screen();
 
 	// precompute cell densities in a way optimized for cache locality
@@ -94,6 +103,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	Termios orig_term = enable_raw_term();
+	init_input();
 	Timespec start_time, end_time;
 	long elapsed_time, total_frame_time, sleep_time;
 
@@ -106,6 +116,9 @@ int main(int argc, char *argv[]) {
 		simulate();
 		render();
 		handle_input();
+
+		if (enable_player)
+			update_player();
 
 		clock_gettime(CLOCK_MONOTONIC, &end_time);
 		elapsed_time = (end_time.tv_sec - start_time.tv_sec) * 1000000 +
@@ -126,6 +139,7 @@ int main(int argc, char *argv[]) {
 
 	free(grid);
 	free(frame_buffer);
+	shutdown_input();
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_term);
 	reset_term();
 	return EXIT_SUCCESS;

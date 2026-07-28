@@ -8,6 +8,7 @@ const Element element_registry[] = {
                .color_len = sizeof(BLACK) - 1,
                .bg_color_len = sizeof(BG_BLACK) - 1,
                .density = 0,
+               .category = CAT_EMPTY,
                .sim_fn = NULL      },
 
 	[WALL] = { .name = "Wall",
@@ -16,6 +17,7 @@ const Element element_registry[] = {
 	           .color_len = sizeof(WHITE) - 1,
 	           .bg_color_len = sizeof(BG_WHITE) - 1,
 	           .density = 255,
+	           .category = CAT_SOLID,
 	           .sim_fn = NULL      },
 
 	[SAND] = { .name = "Sand",
@@ -24,6 +26,7 @@ const Element element_registry[] = {
 	           .color_len = sizeof(YELLOW) - 1,
 	           .bg_color_len = sizeof(BG_YELLOW) - 1,
 	           .density = 100,
+	           .category = CAT_SOLID,
 	           .sim_fn = sim_sand  },
 
 	[STONE] = { .name = "Stone",
@@ -32,6 +35,7 @@ const Element element_registry[] = {
                .color_len = sizeof(GRAY) - 1,
                .bg_color_len = sizeof(BG_GRAY) - 1,
                .density = 100,
+               .category = CAT_SOLID,
                .sim_fn = sim_stone },
 
 	[WATER] = { .name = "Water",
@@ -40,6 +44,7 @@ const Element element_registry[] = {
                .color_len = sizeof(BLUE) - 1,
                .bg_color_len = sizeof(BG_BLUE) - 1,
                .density = 50,
+               .category = CAT_LIQUID,
                .sim_fn = sim_water },
 
 	[OIL] = { .name = "Oil",
@@ -48,6 +53,7 @@ const Element element_registry[] = {
 	           .color_len = sizeof(PURPLE) - 1,
 	           .bg_color_len = sizeof(BG_PURPLE) - 1,
 	           .density = 10,
+	           .category = CAT_LIQUID,
 	           .sim_fn = sim_oil   },
 
 	[FIRE] = { .name = "Fire",
@@ -56,6 +62,7 @@ const Element element_registry[] = {
 	           .color_len = sizeof(RED) - 1,
 	           .bg_color_len = sizeof(BG_RED) - 1,
 	           .density = 1,
+	           .category = CAT_GAS,
 	           .sim_fn = sim_fire  },
 
 	[STEAM] = { .name = "Steam",
@@ -64,6 +71,7 @@ const Element element_registry[] = {
                .color_len = sizeof(WHITE) - 1,
                .bg_color_len = sizeof(BG_WHITE) - 1,
                .density = 1,
+               .category = CAT_GAS,
                .sim_fn = sim_steam },
 
 	[LAVA] = { .name = "Lava",
@@ -72,6 +80,7 @@ const Element element_registry[] = {
 	           .color_len = sizeof(RED) - 1,
 	           .bg_color_len = sizeof(BG_RED) - 1,
 	           .density = 50,
+	           .category = CAT_LIQUID,
 	           .sim_fn = sim_lava  },
 
 	[WOOD] = { .name = "Wood",
@@ -80,6 +89,7 @@ const Element element_registry[] = {
 	           .color_len = sizeof(BROWN) - 1,
 	           .bg_color_len = sizeof(BG_BROWN) - 1,
 	           .density = 100,
+	           .category = CAT_SOLID,
 	           .sim_fn = sim_wood  },
 
 	[ASH] = { .name = "Ash",
@@ -88,6 +98,7 @@ const Element element_registry[] = {
 	           .color_len = sizeof(LGRAY) - 1,
 	           .bg_color_len = sizeof(BG_LGRAY) - 1,
 	           .density = 100,
+	           .category = CAT_SOLID,
 	           .sim_fn = sim_ash   },
 
 	[EMBER] = { .name = "Ember",
@@ -96,6 +107,7 @@ const Element element_registry[] = {
                .color_len = sizeof(ORANGE) - 1,
                .bg_color_len = sizeof(BG_ORANGE) - 1,
                .density = 100,
+               .category = CAT_SOLID,
                .sim_fn = sim_ember   },
 
 	[GUNPOWDER] = { .name = "Gunpowder",
@@ -104,5 +116,6 @@ const Element element_registry[] = {
 	                .color_len = sizeof(DKOLIVE) - 1,
 	                .bg_color_len = sizeof(BG_DKOLIVE) - 1,
 	                .density = 100,
+	                .category = CAT_SOLID,
 	                .sim_fn = sim_gunpowder }
 };

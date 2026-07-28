@@ -144,6 +144,9 @@ extern int cur_radius;
 /** @brief Number of non-empty cells currently present in the simulation. */
 extern int cell_count;
 
+/** @brief Whether the player character is enabled in the simulation. */
+extern bool enable_player;
+
 /**
  * @typedef ElementSimFn
  * @brief Simulation callback for a single cell.
@@ -152,6 +155,17 @@ extern int cell_count;
  */
 typedef void (*ElementSimFn)(int x, int y);
 
+/**
+ * @brief Broad physical phase of an element, used for player collision/interaction
+ * (stand on solids, pass through gases, swim in liquids) independent of density.
+ */
+typedef enum {
+	CAT_EMPTY,
+	CAT_GAS,
+	CAT_LIQUID,
+	CAT_SOLID
+} ElementCategory;
+
 typedef struct {
 	const char *name;            /**< Human-readable element name shown in the UI. */
 	const char *color;           /**< ANSI foreground color sequence for rendering. */
@@ -159,6 +173,7 @@ typedef struct {
 	size_t color_len;            /**< Cached byte length of @ref color. */
 	size_t bg_color_len;         /**< Cached byte length of @ref bg_color. */
 	const unsigned char density; /**< Relative density used by movement rules. */
+	ElementCategory category;    /**< Solid/liquid/gas/empty phase for player collision. */
 	ElementSimFn sim_fn;         /**< Per-cell behavior callback, or NULL if static. */
 } Element;
 

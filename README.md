@@ -54,6 +54,12 @@ Optional flags:
 | Left click / drag | Paint selected material |
 | Right click / drag | Erase (paint Empty) |
 | Mouse wheel | Cycle selected material |
+| `A` / `D` | Move player left / right |
+| `W` | Jump (grounded/airborne); swim up while in a liquid |
+| Space | Jump |
+| `S` | Swim down while in a liquid (no effect on dry ground) |
+| Shift + `A`/`D` | Sprint |
+| `R` | Respawn player at the top of the screen |
 
 ## Elements (13 types)
 
@@ -95,6 +101,15 @@ The main loop runs `simulate()` → `render()` → `handle_input()`.
 - Simulation work is restricted to an active region (`min/max_active_*`) with a one-cell margin instead of scanning the full grid.
 - Swaps set active bits on both cells to prevent same-frame double updates; bits are cleared after the region pass.
 
+### Player
+
+- Each element carries a `category` (solid/liquid/gas/empty) independent of density, used purely for player collision: solids block movement and provide footing, liquids are swimmable (no collision, but W/S swim up/down and gravity is replaced by direct vertical control), gases are passed through freely.
+- Movement/gravity/jumping run on an integer fixed-point accumulator (matching the rest of the sim's non-dt, per-tick model) so sub-cell speeds still move smoothly frame to frame.
+- Jump count refills to its max whenever a cell directly below the player's feet is solid *at the start of a tick* (checked before that tick's own jump can consume a charge) — this is what gives double/triple jumping (tunable `MAX_JUMPS` in `player.c`).
+- Horizontal movement auto-steps up onto a solid bump up to `MAX_STEP_HEIGHT` cells tall instead of blocking outright, so slopes/staircases built from elements are walkable; taller ledges still require a jump. Tune `MAX_STEP_HEIGHT` in `player.c` to taste.
+- `R` clears the player's spawn cells before placing them, so respawning always frees a buried player rather than reburying them.
+- The player isn't part of the grid — it's overlaid onto the rendered frame by position, so it never displaces or gets displaced by simulated terrain outside of normal collision checks.
+
 ### Explosion system (Gunpowder)
 
 When ignited, Gunpowder triggers a BFS-based chain reaction:
@@ -117,6 +132,10 @@ Non-blocking (`select()`) in raw mode:
 - Escape sequence parsing for SGR mouse (`\e[<...M/m`) — supports click/drag painting and scroll wheel.
 - Right-click erases (paints Empty).
 
+#### Player movement input
+
+Plain terminal bytes have no key-up event and Shift+letter just changes the byte — there's no way to know a movement key is *still* held from raw bytes alone. Player input requires the [Kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/): at startup the app unconditionally pushes disambiguate + report-events + report-all-keys + report-text flags (`\e[>27u`), so every key gets real press/repeat/release reporting with its resulting text — held state (and Shift, tracked per-key for sprint) is exact, with no timeout/decay heuristics. Non-movement keys decoded from these events are re-dispatched through the same single-character handling a plain byte would have used, so every other control (quit, material selection, brush size) works unchanged. On a terminal without support, movement/jump/sprint/respawn simply won't respond (mouse painting and single-key material bindings are unaffected, since those aren't gated on this protocol). The flags are popped (`\e[<u`) on exit.
+
 ## Project structure
 
 ```
@@ -131,8 +150,10 @@ src/
   element_registry.c # Static element definitions table (name, color, density, sim_fn)
   render.c           # Frame assembly, ANSI optimization, HUD
   render.h           # Render API
-  input.c            # Non-blocking input, keyboard bindings, SGR mouse parsing
+  input.c            # Non-blocking input, keyboard bindings, SGR mouse parsing, Kitty keyboard protocol
   input.h            # Input API
+  player.c           # Player physics, collision, respawn
+  player.h           # Player API
   term_ops.c         # Terminal mode setup/teardown, ANSI helpers
   term_ops.h         # Terminal ops API
   common.h           # Shared constants, types, globals, ANSI codes
@@ -150,7 +171,6 @@ src/
 
 - More elements: Acid, Lightning, Life
 - Rework explosions to account for thin lines of explosives
-- Player character
 - Multithreading
 - Pause / step mode
 - GUI improvements: menu system, help screen (`h`), options (`o`)
