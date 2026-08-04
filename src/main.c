@@ -1,4 +1,7 @@
+#include <getopt.h>
+
 #include "common.h"
+#include "history.h"
 #include "input.h"
 #include "player.h"
 #include "render.h"
@@ -23,6 +26,8 @@ int sim_mouse_y = 0;
 int cur_radius = 1;
 int cell_count = 0;
 bool enable_player = false;
+bool step_mode = false;
+bool paused = false;
 
 void handle_sigint(int sig) {
 	(void)sig;
@@ -58,9 +63,18 @@ int main(int argc, char *argv[]) {
 	bool height_set = false;
 	int term_width = 0;
 	int term_height = 0;
+	int history_capacity = DEFAULT_HISTORY_CAPACITY;
 	enable_player = false;
+	step_mode = false;
+	paused = false;
 
-	while ((opt = getopt(argc, argv, "w:h:f:p")) != -1) {
+	static const struct option long_options[] = {
+		{ "step", no_argument, NULL, 's' },
+		{ "memory", required_argument, NULL, 'm' },
+		{ NULL, 0, NULL, 0 }
+	};
+
+	while ((opt = getopt_long(argc, argv, "w:h:f:p", long_options, NULL)) != -1) {
 		switch (opt) {
 		case 'w':
 			set_width = atoi(optarg) > 1 ? atoi(optarg) : set_width;
@@ -75,6 +89,12 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'p':
 			enable_player = true;
+			break;
+		case 's':
+			step_mode = true;
+			break;
+		case 'm':
+			history_capacity = atoi(optarg) > 0 ? atoi(optarg) : DEFAULT_HISTORY_CAPACITY;
 			break;
 		}
 	}
@@ -95,6 +115,9 @@ int main(int argc, char *argv[]) {
 	if (enable_player) {
 		init_player();
 	}
+	if (step_mode) {
+		init_history(history_capacity);
+	}
 	init_screen();
 
 	// precompute cell densities in a way optimized for cache locality
@@ -113,12 +136,17 @@ int main(int argc, char *argv[]) {
 	while (running) {
 		clock_gettime(CLOCK_MONOTONIC, &start_time);
 
-		simulate();
+		if (!paused) {
+			simulate();
+		}
 		render();
 		handle_input();
 
-		if (enable_player)
+		if (enable_player && !paused)
 			update_player();
+
+		if (step_mode && !paused)
+			history_push();
 
 		clock_gettime(CLOCK_MONOTONIC, &end_time);
 		elapsed_time = (end_time.tv_sec - start_time.tv_sec) * 1000000 +
@@ -139,6 +167,9 @@ int main(int argc, char *argv[]) {
 
 	free(grid);
 	free(frame_buffer);
+	if (step_mode) {
+		shutdown_history();
+	}
 	shutdown_input();
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_term);
 	reset_term();

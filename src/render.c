@@ -1,6 +1,7 @@
 #include "render.h"
 #include "player.h"
 #include "term_ops.h"
+#include "history.h"
 
 static char gui_buffer[256];
 
@@ -19,6 +20,17 @@ static char *gui(int cell_count) {
 		         "Selected: %d (%s) | Brush Size: %d\033[K",
 		         fps, target_fps, cell_count, mouse_x, mouse_y, sim_mouse_y,
 		         current_cell, element_registry[current_cell].name, cur_radius);
+	}
+
+	if (step_mode) {
+		int len = (int)strlen(gui_buffer);
+		int frames_back = history_frames_back();
+		snprintf(gui_buffer + len, sizeof(gui_buffer) - (size_t)len,
+		         " | Frame: %d/%d%s%s",
+		         history_total() > 0 ? history_total() - frames_back : 0,
+		         history_total(),
+		         frames_back > 0 ? " (rewound) " : " ",
+		         paused ? "PAUSED" : "RUNNING");
 	}
 
 	return gui_buffer;

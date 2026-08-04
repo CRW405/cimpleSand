@@ -33,8 +33,10 @@
 #define ASH 10
 #define EMBER 11
 #define GUNPOWDER 12
+#define ACID 13
+#define LIGHTNING 14
 
-#define ELEMENT_COUNT (GUNPOWDER + 1)
+#define ELEMENT_COUNT (LIGHTNING + 1)
 
 #define CLEAR "\033[2J"
 #define CUR_TO_TOP "\033[H"
@@ -78,6 +80,8 @@
 #define ORANGE "\033[38;5;208m"
 #define BG_DKOLIVE "\033[48;5;58m"
 #define DKOLIVE "\033[38;5;58m"
+#define LIME "\033[38;5;46m"
+#define BG_LIME "\033[48;5;46m"
 
 #define RESET_STYLE "\033[0m"
 
@@ -146,6 +150,12 @@ extern int cell_count;
 
 /** @brief Whether the player character is enabled in the simulation. */
 extern bool enable_player;
+
+/** @brief Whether pause/step mode (--step) is enabled. */
+extern bool step_mode;
+
+/** @brief Whether the simulation is currently paused (--step mode only). */
+extern bool paused;
 
 /**
  * @typedef ElementSimFn

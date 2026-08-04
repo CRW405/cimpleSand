@@ -31,6 +31,9 @@ Optional flags:
 | `-w <width>` | Simulation grid width (auto-fits terminal if omitted) |
 | `-h <height>` | Simulation grid height (auto-fits terminal if omitted) |
 | `-f <fps>`  | Target FPS (default 60; `-f 0` resets to 60; negative = uncapped) |
+| `-p` | Enable playable character |
+| `--step` | Enable pause/step mode (`p` to pause, `[`/`]` to scrub time) |
+| `--memory <n>` | Past frames retained in `--step` mode (default 100) |
 
 ## Controls
 
@@ -44,6 +47,8 @@ Optional flags:
 | `5` | Steam |
 | `6` | Oil |
 | `7` | Gunpowder |
+| `8` | Acid |
+| `9` | Lightning |
 | `Shift+1` (`!`) | Stone |
 | `Shift+2` (`@`) | Ash |
 | `Shift+3` (`#`) | Lava |
@@ -54,14 +59,18 @@ Optional flags:
 | Left click / drag | Paint selected material |
 | Right click / drag | Erase (paint Empty) |
 | Mouse wheel | Cycle selected material |
+| Shift + mouse wheel | Adjust brush size |
 | `A` / `D` | Move player left / right |
 | `W` | Jump (grounded/airborne); swim up while in a liquid |
 | Space | Jump |
 | `S` | Swim down while in a liquid (no effect on dry ground) |
 | Shift + `A`/`D` | Sprint |
 | `R` | Respawn player at the top of the screen |
+| `p` | Pause/Resume simulation (`--step` mode) |
+| `[` | Step back one frame (`--step` mode, while paused) |
+| `]` | Step forward one frame (`--step` mode, while paused) |
 
-## Elements (13 types)
+## Elements (15 types)
 
 | Element | Type | Behavior |
 |---|---|---|
@@ -73,8 +82,10 @@ Optional flags:
 | **Water** | Liquid | Falls, spreads laterally (up to 10 cells), evaporates when isolated |
 | **Oil** | Liquid | Lighter than water — floats on top |
 | **Lava** | Liquid | Falls and spreads slowly; turns Water to Steam (solidifying into Stone), ignites Oil/Wood |
+| **Acid** | Liquid | Falls/flows like a liquid and dissolves adjacent materials; denser materials resist it and wear the acid out faster (tune `acid_power` inside `sim_acid()` in `element.c` |
 | **Fire** | Gas | Rises, drifts, ignites Oil/Wood/Gunpowder, turns Water to Steam, extinguishes randomly |
 | **Steam** | Gas | Rises, drifts laterally (up to 5 cells), condenses back to Water |
+| **Lightning** | Gas | Bolts straight down in a jagged pattern; immediately dissipates on impact, igniting Wood/Oil/Gunpowder and steaming Water. Its path is a pure function of its spawn cell, so bolts from the same point always retrace the same pattern |
 | **Wood** | Static | Ignites (becomes Ember) when adjacent to Fire/Lava |
 | **Ember** | Static | Burning Wood — spawns Fire above, collapses to Ash after ~2 seconds |
 | **Empty** | — | Empty space |
@@ -109,6 +120,17 @@ The main loop runs `simulate()` → `render()` → `handle_input()`.
 - Horizontal movement auto-steps up onto a solid bump up to `MAX_STEP_HEIGHT` cells tall instead of blocking outright, so slopes/staircases built from elements are walkable; taller ledges still require a jump. Tune `MAX_STEP_HEIGHT` in `player.c` to taste.
 - `R` clears the player's spawn cells before placing them, so respawning always frees a buried player rather than reburying them.
 - The player isn't part of the grid — it's overlaid onto the rendered frame by position, so it never displaces or gets displaced by simulated terrain outside of normal collision checks.
+
+### Pause / step mode (`--step`)
+
+`--step` turns on a ring-buffer of world snapshots so you can freeze the sim and scrub through time:
+
+- `p` toggles pause. While paused the sim and player are frozen; painting still works.
+- `]` advances one frame — restores a saved "future" snapshot if you've rewound, otherwise runs one real sim step and snapshots it.
+- `[` rewinds one frame to the previous snapshot.
+- History is capped at `--memory <n>` frames (default 100); the newest frames evict the oldest once full, and rewound "futures" survive until pushed out by new frames.
+- Editing the world while viewing a rewound frame (or resuming from one) invalidates every snapshot after it — the next steps run the sim forward from the changed state instead of restoring stale frames that would clobber your edit.
+- Each snapshot stores the full grid plus the player state, and restoring one recomputes the cell count and resets the active region so the next step re-simulates correctly.
 
 ### Explosion system (Gunpowder)
 
@@ -169,10 +191,9 @@ src/
 
 ### TODO:
 
-- More elements: Acid, Lightning, Life
+- More elements: Life, dirt, mud, metal
 - Rework explosions to account for thin lines of explosives
 - Multithreading
-- Pause / step mode
 - GUI improvements: menu system, help screen (`h`), options (`o`)
 - Velocity system
 - Graphical rendering

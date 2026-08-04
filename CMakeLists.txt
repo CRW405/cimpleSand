@@ -11,6 +11,7 @@ add_executable(CimpleSand
     src/player.c
     src/render.c
     src/sim.c
+    src/history.c
     src/element.c
     src/element_registry.c
     src/element_utils.c

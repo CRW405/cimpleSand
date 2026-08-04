@@ -62,4 +62,12 @@ void paint(int x_center, int y_center, int radius, char cell);
  */
 void simulate(void);
 
+/**
+ * @brief Resets the active region to span the entire grid.
+ *
+ * Used after restoring a snapshot from history so the next step re-simulates
+ * the whole world instead of relying on stale dirty-region bounds.
+ */
+void reset_active_region(void);
+
 #endif

@@ -12,5 +12,7 @@ void sim_wood(int x, int y);
 void sim_ash(int x, int y);
 void sim_ember(int x, int y);
 void sim_gunpowder(int x, int y);
+void sim_acid(int x, int y);
+void sim_lightning(int x, int y);
 
 #endif

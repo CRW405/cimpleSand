@@ -139,3 +139,10 @@ void simulate() {
 		}
 	}
 }
+
+void reset_active_region(void) {
+	min_active_x = 0;
+	max_active_x = screen_width - 1;
+	min_active_y = 0;
+	max_active_y = screen_height - 1;
+}

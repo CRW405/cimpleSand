@@ -187,3 +187,140 @@ void sim_gunpowder(int x, int y) {
 		return;
 	try_fall_diagonal(x, y, GUNPOWDER);
 }
+
+static bool try_acid_dissolve(int x, int y, int tx, int ty, int acid_power) {
+	unsigned char target = get_cell(tx, ty);
+	if (target == EMPTY || target == ACID || target == WALL)
+		return false;
+
+	int target_density = cell_densities[target];
+	if (target_density <= 0)
+		return false;
+
+	if (rand() % (acid_power + target_density) >= acid_power)
+		return false;
+
+	bool consumed = rand() % (acid_power + target_density) < target_density;
+
+	set_cell(tx, ty, EMPTY);
+	if (consumed) {
+		set_cell(x, y, EMPTY);
+	} else {
+		swap_cells(x, y, tx, ty);
+	}
+	return true;
+}
+
+void sim_acid(int x, int y) {
+	int acid_power = 25;
+
+	if (try_fall_down(x, y, ACID))
+		return;
+	if (try_fall_diagonal(x, y, ACID))
+		return;
+
+	int dx[] = { 0, 0, -1, 1 };
+	int dy[] = { -1, 1, 0, 0 };
+
+	for (int i = 0; i < 4; i++) {
+		if (try_acid_dissolve(x, y, x + dx[i], y + dy[i], acid_power))
+			return;
+	}
+
+	try_liquid_flow(x, y, ACID, 10);
+}
+
+static unsigned bolt_hash(int x, int y) {
+	unsigned h = (unsigned)(x * 0x9E3779B1u) ^ (unsigned)(y * 0x85EBCA6Bu);
+	h ^= h >> 13;
+	h *= 0xC2B2AE35u;
+	h ^= h >> 16;
+	return h;
+}
+
+static void lightning_strike(int x, int y) {
+	unsigned char hit = get_cell(x, y);
+
+	switch (hit) {
+	case WOOD:
+		set_cell(x, y, EMBER);
+		break;
+	case OIL:
+		set_cell(x, y, FIRE);
+		break;
+	case GUNPOWDER:
+		trigger_explosion(x, y, 0);
+		return;
+	case WATER:
+		set_cell(x, y, STEAM);
+		break;
+	}
+
+	int dx[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+	int dy[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+
+	for (int i = 0; i < 8; i++) {
+		unsigned char c = get_cell(x + dx[i], y + dy[i]);
+		switch (c) {
+		case WOOD:
+			set_cell(x + dx[i], y + dy[i], EMBER);
+			break;
+		case OIL:
+			set_cell(x + dx[i], y + dy[i], FIRE);
+			break;
+		case GUNPOWDER:
+			trigger_explosion(x + dx[i], y + dy[i], 0);
+			break;
+		case WATER:
+			set_cell(x + dx[i], y + dy[i], STEAM);
+			break;
+		}
+	}
+}
+
+void sim_lightning(int x, int y) {
+	int lightning_speed = 1;
+
+	if (y + 1 >= screen_height) {
+		lightning_strike(x, y);
+		set_cell(x, y, EMPTY);
+		return;
+	}
+
+	int cur_x = x;
+	int cur_y = y;
+
+	for (int i = 0; i < lightning_speed; i++) {
+		int next_y = cur_y + 1;
+		if (next_y >= screen_height) {
+			lightning_strike(cur_x, cur_y);
+			set_cell(x, y, EMPTY);
+			return;
+		}
+
+		int jitter = 0;
+		unsigned h = bolt_hash(cur_x, cur_y);
+		jitter = (int)(h % 3) - 1;
+		if (h % 4 == 0)
+			jitter = (h & 1u) ? 2 : -2;
+
+		int next_x = cur_x + jitter;
+		if (next_x < 0)
+			next_x = 0;
+		if (next_x >= screen_width)
+			next_x = screen_width - 1;
+
+		unsigned char cell = get_cell(next_x, next_y);
+		if (cell != EMPTY && cell != LIGHTNING) {
+			lightning_strike(next_x, next_y);
+			set_cell(x, y, EMPTY);
+			return;
+		}
+
+		cur_x = next_x;
+		cur_y = next_y;
+	}
+
+	set_cell(x, y, EMPTY);
+	set_cell(cur_x, cur_y, LIGHTNING);
+}

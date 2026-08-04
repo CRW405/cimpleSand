@@ -1,5 +1,6 @@
 #include "input.h"
 #include "sim.h"
+#include "history.h"
 
 static bool left_mouse_held = false;
 static bool right_mouse_held = false;
@@ -94,12 +95,19 @@ static int read_escape_sequence(char *seq, size_t seq_size) {
 static void paint_at_cursor(char cell) {
 	if (cur_radius > 1) {
 		paint(sim_mouse_x, sim_mouse_y, cur_radius, cell);
-		return;
+	} else {
+		if (get_cell(sim_mouse_x, sim_mouse_y) == EMPTY || cell == EMPTY)
+			set_cell(sim_mouse_x, sim_mouse_y, cell);
+		if (get_cell(sim_mouse_x, sim_mouse_y + 1) == EMPTY || cell == EMPTY)
+			set_cell(sim_mouse_x, sim_mouse_y + 1, cell);
 	}
-	if (get_cell(sim_mouse_x, sim_mouse_y) == EMPTY || cell == EMPTY)
-		set_cell(sim_mouse_x, sim_mouse_y, cell);
-	if (get_cell(sim_mouse_x, sim_mouse_y + 1) == EMPTY || cell == EMPTY)
-		set_cell(sim_mouse_x, sim_mouse_y + 1, cell);
+
+	/* Editing a rewound frame invalidates every snapshot after it, so the
+	 * next step runs forward from the changed world instead of restoring a
+	 * stale future that would clobber the edit. */
+	if (step_mode) {
+		history_diverge();
+	}
 }
 
 static void quit_simulation(void) { running = false; }
@@ -112,12 +120,34 @@ static void decrease_radius(void) {
 
 static void increase_radius(void) { cur_radius++; }
 
+static void toggle_pause(void) {
+	if (!step_mode) {
+		return;
+	}
+	paused = !paused;
+}
+
+static void step_back_time(void) {
+	if (step_mode && paused) {
+		history_step_back();
+	}
+}
+
+static void step_forward_time(void) {
+	if (step_mode && paused) {
+		history_step_forward();
+	}
+}
+
 static const KeyBinding key_registry[] = {
 	{ 'q', quit_simulation },
 	{ '_', decrease_radius },
 	{ '-', decrease_radius },
 	{ '=', increase_radius },
-	{ '+', increase_radius }
+	{ '+', increase_radius },
+	{ 'p', toggle_pause },
+	{ '[', step_back_time },
+	{ ']', step_forward_time }
 };
 
 static const EscapeBinding arrow_registry[] = {
@@ -158,6 +188,12 @@ static bool apply_element_binding(char key) {
 		return true;
 	case '7':
 		current_cell = GUNPOWDER;
+		return true;
+	case '8':
+		current_cell = ACID;
+		return true;
+	case '9':
+		current_cell = LIGHTNING;
 		return true;
 	case '!':
 		current_cell = STONE;
@@ -230,19 +266,30 @@ static void handle_mouse_event(const char *seq, int seq_len) {
 	           &parsed_button, &parsed_x, &parsed_y) == 3) {
 		set_mouse_position(parsed_x, parsed_y);
 
-		// Handle Scroll Up (64) and Scroll Down (65)
-		if (parsed_button == 64) {
-			int next = current_cell + 1;
-			if (next >= ELEMENT_COUNT) {
-				next = 1;
+		// Wheel events are 64/65 (up/down); the SGR shift modifier (0x04)
+		// turns them into Shift+scroll, which adjusts the brush size instead
+		// of cycling the selected material.
+		if ((parsed_button & 0x40) != 0) {
+			bool scroll_up = (parsed_button & 0x01) == 0;
+			if ((parsed_button & 0x04) != 0) {
+				if (scroll_up) {
+					increase_radius();
+				} else {
+					decrease_radius();
+				}
+			} else if (scroll_up) {
+				int next = current_cell + 1;
+				if (next >= ELEMENT_COUNT) {
+					next = 1;
+				}
+				current_cell = next;
+			} else {
+				int next = current_cell - 1;
+				if (next < 1) {
+					next = ELEMENT_COUNT - 1;
+				}
+				current_cell = next;
 			}
-			current_cell = next;
-		} else if (parsed_button == 65) {
-			int next = current_cell - 1;
-			if (next < 1) {
-				next = ELEMENT_COUNT - 1;
-			}
-			current_cell = next;
 		} else {
 			// Only update click tracking if it's not a scroll event
 			update_mouse_button_state(event_type, parsed_button);
