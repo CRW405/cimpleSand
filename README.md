@@ -8,6 +8,7 @@
 
 - C compiler (GCC/Clang)
 - CMake 3.10+
+- raylib 3.x+ and `pkg-config` for the optional graphical mode
 - Linux/macOS terminal with ANSI escape + SGR mouse reporting support (developed in kitty)
   - Windows might work via WSL + a compatible terminal
 
@@ -23,6 +24,26 @@ cmake --build build
 ```bash
 ./build/CimpleSand
 ```
+
+### Raylib mode
+
+Run the graphical prototype with:
+
+```bash
+./build/CimpleSand --raylib
+```
+
+Raylib mode opens a resizable 500x500 window by default. The simulation
+dimensions can be set independently; cells remain square and scale to the
+available window:
+
+```bash
+./build/CimpleSand --raylib -w 100 -h 100
+```
+
+The area outside the simulation is black, while the clickable simulation area
+is dark gray. The raylib player uses floating-point movement and native
+frame-time physics while colliding against the cellular simulation.
 
 Optional flags:
 
@@ -69,6 +90,10 @@ Optional flags:
 | `p` | Pause/Resume simulation (`--step` mode) |
 | `[` | Step back one frame (`--step` mode, while paused) |
 | `]` | Step forward one frame (`--step` mode, while paused) |
+
+Raylib mode uses the same controls, with `Esc` also quitting. Shift+mouse
+wheel changes brush size, and Shift+`A`/`D` enables sprinting. Its player uses
+smooth floating-point movement rather than terminal-cell movement.
 
 ## Elements (15 types)
 

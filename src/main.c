@@ -4,6 +4,7 @@
 #include "history.h"
 #include "input.h"
 #include "player.h"
+#include "raylib_mode.h"
 #include "render.h"
 #include "sim.h"
 #include "term_ops.h"
@@ -61,6 +62,7 @@ int main(int argc, char *argv[]) {
 	int set_height = 1;
 	bool width_set = false;
 	bool height_set = false;
+	bool raylib_mode = false;
 	int term_width = 0;
 	int term_height = 0;
 	int history_capacity = DEFAULT_HISTORY_CAPACITY;
@@ -69,12 +71,15 @@ int main(int argc, char *argv[]) {
 	paused = false;
 
 	static const struct option long_options[] = {
-		{ "step", no_argument, NULL, 's' },
-		{ "memory", required_argument, NULL, 'm' },
-		{ NULL, 0, NULL, 0 }
+		{ "step",      no_argument,       NULL, 's' },
+		{ "memory",    required_argument, NULL, 'm' },
+		{ "raylib",    no_argument,       NULL, 'r' },
+		{ "step-mode", no_argument,       NULL, 's' },
+		{ "memory",    required_argument, NULL, 'm' },
+		{ NULL,        0,                 NULL, 0   }
 	};
 
-	while ((opt = getopt_long(argc, argv, "w:h:f:p", long_options, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "w:h:f:pr", long_options, NULL)) != -1) {
 		switch (opt) {
 		case 'w':
 			set_width = atoi(optarg) > 1 ? atoi(optarg) : set_width;
@@ -90,6 +95,9 @@ int main(int argc, char *argv[]) {
 		case 'p':
 			enable_player = true;
 			break;
+		case 'r':
+			raylib_mode = true;
+			break;
 		case 's':
 			step_mode = true;
 			break;
@@ -99,7 +107,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	if (get_terminal_bounds(&term_width, &term_height)) {
+	if (!raylib_mode && get_terminal_bounds(&term_width, &term_height)) {
 		if (!width_set)
 			set_width = term_width;
 		if (!height_set)
@@ -111,9 +119,22 @@ int main(int argc, char *argv[]) {
 	}
 
 	signal(SIGINT, handle_sigint);
+	if (raylib_mode) {
+		if (!width_set)
+			set_width = RAYLIB_DEFAULT_WIDTH;
+		if (!height_set)
+			set_height = RAYLIB_DEFAULT_HEIGHT;
+	}
 	init_grid(set_width, set_height);
 	if (enable_player) {
 		init_player();
+	}
+	if (raylib_mode) {
+		for (int i = 0; i < ELEMENT_COUNT; i++)
+			cell_densities[i] = element_registry[i].density;
+		run_raylib_mode(enable_player, step_mode, history_capacity);
+		free(grid);
+		return EXIT_SUCCESS;
 	}
 	if (step_mode) {
 		init_history(history_capacity);
